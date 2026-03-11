@@ -1,0 +1,9 @@
+*.ds_store
+.env
+TODO.md
+deno.lock
+
+.astro/
+.netlify/
+dist/
+node_modules/

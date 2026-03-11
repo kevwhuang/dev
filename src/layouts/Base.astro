@@ -1,0 +1,75 @@
+---
+import '@fontsource/geist-sans';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+    description: string;
+    title: string;
+}
+
+const { description, title } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <title>{title}</title>
+        <meta content="Kevin Huang" name="author" />
+        <meta content={description} name="description" />
+        <meta content="#000000" name="theme-color" />
+        <link href={canonicalUrl} rel="canonical" />
+        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <meta content={title} property="og:title" />
+        <meta content={description} property="og:description" />
+        <meta content={canonicalUrl} property="og:url" />
+        <meta content="website" property="og:type" />
+        <meta content="dev" property="og:site_name" />
+        <meta content="summary" name="twitter:card" />
+        <meta content={title} name="twitter:title" />
+        <meta content={description} name="twitter:description" />
+        <ClientRouter />
+    </head>
+    <body class="flex min-h-screen flex-col bg-black font-sans text-white">
+        <main class="flex-1">
+            <slot />
+        </main>
+    </body>
+</html>
+
+<style is:global>
+    @import 'tailwindcss';
+
+    :root {
+        --font-sans: 'Geist', system-ui, sans-serif;
+    }
+
+    :focus {
+        outline: none;
+    }
+
+    :focus-visible {
+        outline: 2px solid rgba(6, 182, 212, 0.8);
+        outline-offset: 2px;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+        border-radius: 2px;
+        outline: 2px solid rgba(6, 182, 212, 0.8);
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
