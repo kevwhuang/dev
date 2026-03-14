@@ -26,10 +26,25 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <meta content={description} property="og:description" />
         <meta content={canonicalUrl} property="og:url" />
         <meta content="website" property="og:type" />
+        <meta content={`${Astro.site}og.png`} property="og:image" />
         <meta content="dev" property="og:site_name" />
-        <meta content="summary" name="twitter:card" />
+        <meta content="summary_large_image" name="twitter:card" />
         <meta content={title} name="twitter:title" />
         <meta content={description} name="twitter:description" />
+        <meta content={`${Astro.site}og.png`} name="twitter:image" />
+        <script
+            type="application/ld+json"
+            set:html={JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                'name': 'Dev',
+                'url': 'https://dev.aephonics.com',
+                'founder': {
+                    '@type': 'Person',
+                    'name': 'Kevin Huang',
+                },
+            })}
+        />
         <ClientRouter />
     </head>
     <body class="flex min-h-screen flex-col bg-black font-sans text-white">
@@ -43,6 +58,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     @import 'tailwindcss';
 
     :root {
+        --color-cyan: 6, 182, 212;
         --font-sans: 'Geist', system-ui, sans-serif;
     }
 
@@ -51,14 +67,14 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     }
 
     :focus-visible {
-        outline: 2px solid rgba(6, 182, 212, 0.8);
+        outline: 2px solid rgba(var(--color-cyan), 0.8);
         outline-offset: 2px;
     }
 
     a:focus-visible,
     button:focus-visible {
         border-radius: 2px;
-        outline: 2px solid rgba(6, 182, 212, 0.8);
+        outline: 2px solid rgba(var(--color-cyan), 0.8);
         outline-offset: 2px;
     }
 
