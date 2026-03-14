@@ -1,9 +1,9 @@
 *.ds_store
 .env
 TODO.md
-deno.lock
 
 .astro/
 .netlify/
+.playwright/
 dist/
 node_modules/

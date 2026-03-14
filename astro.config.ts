@@ -10,9 +10,6 @@ export default defineConfig({
     devToolbar: {
         enabled: false,
     },
-    image: {
-        experimentalLayout: 'responsive',
-    },
     integrations: [
         react(),
         robots(),

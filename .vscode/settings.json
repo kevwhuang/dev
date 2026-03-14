@@ -1,1 +1,27 @@
-{}
+{
+    "breadcrumbs.enabled": false,
+    "editor.fontSize": 20,
+    "editor.hover.enabled": "off",
+    "editor.quickSuggestions": {
+        "other": false,
+    },
+    "editor.minimap.enabled": false,
+    "editor.scrollbar.horizontalScrollbarSize": 20,
+    "editor.scrollbar.verticalScrollbarSize": 20,
+    "editor.stickyScroll.enabled": false,
+    "extensions.ignoreRecommendations": true,
+    "js/ts.implicitProjectConfig.target": "ESNext",
+    "npm.packageManager": "bun",
+    "terminal.integrated.fontSize": 20,
+    "terminal.integrated.initialHint": false,
+    "terminal.integrated.stickyScroll.enabled": false,
+    "window.commandCenter": false,
+    "window.zoomLevel": 1.5,
+    "workbench.activityBar.location": "hidden",
+    "workbench.colorTheme": "Default High Contrast",
+    "workbench.editor.editorActionsLocation": "hidden",
+    "workbench.editor.empty.hint": "hidden",
+    "workbench.layoutControl.enabled": false,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.startupEditor": "none",
+}
