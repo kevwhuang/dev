@@ -7,6 +7,13 @@ port = 8888
 [[headers]]
 for = '/*'
 [headers.values]
-content-security-policy = 'block-all-mixed-content'
+content-security-policy = "default-src 'self'; font-src 'self'; frame-ancestors 'self'; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+permissions-policy = 'camera=(), microphone=(), geolocation=()'
+referrer-policy = 'strict-origin-when-cross-origin'
 x-content-type-options = 'nosniff'
 x-frame-options = 'sameorigin'
+
+[[headers]]
+for = '/_astro/*'
+[headers.values]
+cache-control = 'public, max-age=31536000, immutable'
