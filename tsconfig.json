@@ -1,5 +1,11 @@
 {
     "extends": "astro/tsconfigs/strict",
+    "exclude": [
+        ".netlify",
+        "dist",
+        "node_modules",
+        "tests"
+    ],
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
@@ -28,11 +34,5 @@
         "types": [
             "bun-types"
         ]
-    },
-    "exclude": [
-        ".netlify",
-        "dist",
-        "node_modules",
-        "tests"
-    ]
+    }
 }
