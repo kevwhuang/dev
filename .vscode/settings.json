@@ -3,7 +3,7 @@
     "editor.fontSize": 20,
     "editor.hover.enabled": "off",
     "editor.quickSuggestions": {
-        "other": false,
+        "other": false
     },
     "editor.minimap.enabled": false,
     "editor.scrollbar.horizontalScrollbarSize": 20,
@@ -23,5 +23,5 @@
     "workbench.editor.empty.hint": "hidden",
     "workbench.layoutControl.enabled": false,
     "workbench.secondarySideBar.defaultVisibility": "hidden",
-    "workbench.startupEditor": "none",
+    "workbench.startupEditor": "none"
 }

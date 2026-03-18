@@ -8,13 +8,6 @@ const ignores = {
     ignores: ['.astro/', 'dist/', '.netlify/'],
 };
 
-const style = stylistic.configs.customize({
-    braceStyle: '1tbs',
-    indent: 4,
-    quotes: 'single',
-    semi: true,
-});
-
 const overrides = {
     files: ['**/*.astro', '**/*.astro/*.ts'],
     rules: {
@@ -22,6 +15,13 @@ const overrides = {
         '@stylistic/operator-linebreak': 'off',
     },
 };
+
+const style = stylistic.configs.customize({
+    braceStyle: '1tbs',
+    indent: 4,
+    quotes: 'single',
+    semi: true,
+});
 
 export default [
     ignores,
