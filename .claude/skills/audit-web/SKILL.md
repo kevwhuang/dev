@@ -1,5 +1,6 @@
 ---
-description: Enforce web project standards for structure, visuals, performance, security, and more
+description: Enforce web project standards across all categories
+name: audit-web
 user-invocable: true
 ---
 
@@ -163,5 +164,5 @@ Skip paths in `.gitignore`.
 - Report issues in a table with columns: File, Lines, Issue
 - Report only. No recommendations, no editorializing, no offering to fix.
 - Get user approval before making any fixes
-- No logic changes
+- No logic changes. Report and flag only.
 - Run `bun run lint` after all changes are applied

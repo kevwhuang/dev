@@ -1,5 +1,6 @@
 ---
 description: Enforce HTML and Astro markup conventions
+name: audit-html
 user-invocable: true
 ---
 
