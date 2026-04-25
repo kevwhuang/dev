@@ -5,7 +5,7 @@ import stylistic from '@stylistic/eslint-plugin';
 import ts from 'typescript-eslint';
 
 const ignores = {
-    ignores: ['.astro/', 'dist/', '.netlify/'],
+    ignores: ['.astro/', '.netlify/', 'dist/'],
 };
 
 const overrides = {
