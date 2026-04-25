@@ -1,5 +1,6 @@
 ---
-description: Enforce CSS and Tailwind conventions
+description: Enforce CSS and Tailwind conventions in stylesheets and Astro files
+name: audit-css
 user-invocable: true
 ---
 
@@ -20,6 +21,8 @@ Sort declaration blocks by selector type in this precedence, then sort selectors
 4. **Pseudo-element**: `.block::before`, `.block::after`, `::-webkit-scrollbar`
 5. **`:global()`**: `:global(pre)`, `:global(.line)`
 6. **`@media` and `@keyframes`**: media queries first, keyframes last
+
+Pseudo-elements immediately follow their base selector. Compound hover selectors like `.block:hover .block__element::before` sort within the pseudo-class group.
 
 ## Naming
 
@@ -46,7 +49,7 @@ All interactive elements must have visible hover and focus states. States must m
 
 ## Responsiveness
 
-No overflow, clipping, or broken layouts at any viewport.
+No overflow, clipping, or broken layouts at any viewport. Prefer `clamp()` over `@media` breakpoints. All clamp formulas target 320–1280px viewport range.
 
 ## Tailwind Classes
 

@@ -1,5 +1,3 @@
-/// <reference types="vitest/config" />
-
 import { getViteConfig } from 'astro/config';
 
 export default getViteConfig({
@@ -9,4 +7,4 @@ export default getViteConfig({
             'tests/unit/**/*.test.ts',
         ],
     },
-});
+} as Parameters<typeof getViteConfig>[0]);

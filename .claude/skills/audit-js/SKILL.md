@@ -1,5 +1,6 @@
 ---
-description: Enforce JavaScript and TypeScript conventions
+description: Enforce JavaScript and TypeScript conventions in scripts and Astro files
+name: audit-js
 user-invocable: true
 ---
 
@@ -18,7 +19,7 @@ Reorder top-level declarations in this sequence:
 4. **Variables**: derived or computed state
 5. **Helpers**: internal utility functions
 6. **Main logic**: primary functions and classes
-7. **Exports**: `export` and `export default` at the very end
+7. **Exports**: inline named exports at declaration, no `export default` or `export { }` blocks
 
 ## Tests
 

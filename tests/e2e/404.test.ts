@@ -22,6 +22,7 @@ test.describe('404 page', () => {
 
     test('return link navigates home', async ({ page }) => {
         await page.click('a[aria-label="Return to home"]');
+        await page.waitForURL('/');
         await expect(page).toHaveTitle('Dev');
     });
 });
