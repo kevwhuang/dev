@@ -22,7 +22,7 @@ Sort declaration blocks by selector type in this precedence, then sort selectors
 5. **`:global()`**: `:global(pre)`, `:global(.line)`
 6. **`@media` and `@keyframes`**: media queries first, keyframes last
 
-Pseudo-elements immediately follow their base selector. Compound hover selectors like `.block:hover .block__element::before` sort within the pseudo-class group.
+Pseudo-classes and pseudo-elements immediately follow their base selector. Compound hover selectors like `.block:hover .block__element::before` sort within the pseudo-class group.
 
 ## Naming
 
