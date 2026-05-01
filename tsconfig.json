@@ -11,17 +11,14 @@
             "@/*": [
                 "./src/*"
             ],
-            "@assets/*": [
-                "./src/assets/*"
-            ],
             "@components/*": [
                 "./src/components/*"
             ],
             "@content/*": [
                 "./src/content/*"
             ],
-            "@layouts/*": [
-                "./src/layouts/*"
+            "@images/*": [
+                "./src/images/*"
             ],
             "@lib/*": [
                 "./src/lib/*"
