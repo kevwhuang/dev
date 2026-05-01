@@ -1,5 +1,5 @@
 ---
-import Base from '@layouts/Base.astro';
+import Layout from '@/Layout.astro';
 import NotFound from '@sections/NotFound.astro';
 
 Astro.response.status = 404;
@@ -7,9 +7,9 @@ Astro.response.status = 404;
 export const prerender = false;
 ---
 
-<Base
+<Layout
     description="The page you're looking for doesn't exist."
     title="404 - Not Found"
 >
     <NotFound />
-</Base>
+</Layout>

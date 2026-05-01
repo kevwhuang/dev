@@ -13,7 +13,8 @@
             "WebFetch",
             "WebSearch",
             "Write",
-            "mcp__ide__*"
+            "mcp__ide__*",
+            "mcp__supabase__*"
         ]
     }
 }
