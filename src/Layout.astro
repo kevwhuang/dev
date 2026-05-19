@@ -2,6 +2,8 @@
 import '@fontsource/geist-sans/index.css';
 import { ClientRouter } from 'astro:transitions';
 
+import '@/styles.css';
+
 interface Props {
     description: string;
     title: string;
@@ -33,6 +35,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <meta content={description} name="twitter:description" />
         <meta content={`${Astro.site}og.png`} name="twitter:image" />
         <script
+            is:inline
             set:html={JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
@@ -58,9 +61,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     @import 'tailwindcss';
 
     :root {
-        --color-cyan: 6, 182, 212;
+        --color-indigo: 99, 102, 241;
         --font-sans: 'Geist', system-ui, sans-serif;
-        --rgb-white: 255, 255, 255;
     }
 
     :focus {
@@ -69,7 +71,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
     :focus-visible {
         border-radius: 2px;
-        outline: 2px solid rgba(var(--color-cyan), 0.8);
+        outline: 2px solid rgba(var(--color-indigo), 0.8);
         outline-offset: 2px;
     }
 
