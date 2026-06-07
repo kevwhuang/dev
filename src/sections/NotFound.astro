@@ -3,40 +3,17 @@
 ---
 
 <section
-    class="not-found flex items-center justify-center min-h-screen px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] bg-zinc-950"
+    class="flex flex-1 items-center justify-center px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-24"
+    aria-label="Page not found"
 >
-    <div class="not-found__content text-center select-none">
-        <h1
-            class="not-found__title mb-[clamp(1rem,calc(0.33rem+3.33vw),3rem)] font-bold text-[clamp(6rem,calc(3.0rem+15.0vw),15rem)] tracking-widest"
-        >
-            404
-        </h1>
+    <div class="text-center select-none">
+        <h1 class="mb-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] font-sans font-semibold leading-none text-[clamp(6rem,calc(3rem+15vw),15rem)] tracking-widest bg-clip-text bg-linear-to-b from-white-60 text-transparent to-white-40">404</h1>
         <a
-            class="not-found__link inline-block min-h-[clamp(2.75rem,calc(2.42rem+1.67vw),3.5rem)] px-[clamp(1.5rem,calc(1.17rem+1.67vw),2.5rem)] py-[clamp(0.875rem,calc(0.58rem+0.83vw),1.25rem)] border border-white/20 font-mono text-sm lowercase tracking-[0.2em] text-white/70 transition-all duration-300"
+            class="active:opacity-70 hover:[text-shadow:0_0_20px_var(--color-indigo-80)] hover:bg-white-20 hover:border-indigo-80 hover:text-indigo-80 inline-block min-h-[clamp(2.75rem,calc(2.5rem+1.25vw),3.5rem)] px-[clamp(1.25rem,calc(1rem+1.25vw),2rem)] py-[clamp(0.875rem,calc(0.75rem+0.625vw),1.25rem)] border border-white-20 font-mono text-base tracking-[0.2em] text-white-60 duration-150 transition-[background,border-color,color,opacity,text-shadow]"
             aria-label="Return to home"
             href="/"
         >
-            return
+            RETURN
         </a>
     </div>
 </section>
-
-<style>
-    .not-found__title {
-        background: linear-gradient(
-            180deg,
-            rgb(from var(--color-white) r g b / 0.9) 0%,
-            rgb(from var(--color-white) r g b / 0.4) 100%
-        );
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .not-found__link:hover {
-        background-color: rgb(from var(--color-white) r g b / 0.05);
-        border-color: rgba(var(--color-indigo), 0.5);
-        color: rgba(var(--color-indigo), 0.9);
-        text-shadow: 0 0 20px rgba(var(--color-indigo), 0.3);
-    }
-</style>

@@ -1,83 +1,103 @@
 ---
-description: Enforce CSS and Tailwind conventions in stylesheets and Astro files
+description: Enforce CSS and Tailwind conventions
 name: audit-css
 user-invocable: true
 ---
 
-Audit `.css` files and `<style>` blocks in `.astro` files.
-Skip paths in `.gitignore`.
+- Audit `.css` files, `<style>` blocks in `.astro` files, and Tailwind classes in `.astro` and `.tsx` files
+- Skip paths in `.gitignore`
 
-## Property Order
+## Protocol
 
-Sort all properties lexicographically, case-sensitive, uppercase before lowercase. No blank lines between properties. Vendor prefixes last.
+- Report issues in a table with columns: ID, File, Lines, Issue
+- No editorializing
+- Fix only with user approval
 
-## Block Order
+## Theme
 
-Sort declaration blocks by selector type in this precedence, then sort selectors lexicographically, case-sensitive, uppercase before lowercase. Follow the same precedence within nested rules.
+- All colors and fonts defined in `@theme`
+- Hex values for all colors
+- WCAG AA contrast: 4.5:1 for text, 3:1 for UI
+- Delete unused `@theme` tokens
 
-1. **Element and `:root`**: `html`, `body`, `:root`
-2. **Class**: `.block`, `.block__element`, `.block--modifier`
-3. **Pseudo-class**: `.block:hover`, `.block:focus`, `.block:first-child`
-4. **Pseudo-element**: `.block::before`, `.block::after`, `::-webkit-scrollbar`
-5. **`:global()`**: `:global(pre)`, `:global(.line)`
-6. **`@media` and `@keyframes`**: media queries first, keyframes last
+## Selectors
 
-Pseudo-classes and pseudo-elements immediately follow their base selector. Compound hover selectors like `.block:hover .block__element::before` sort within the pseudo-class group.
+Sort declaration blocks lexicographically within each tier, pseudos follow their base selector:
+
+1. `*`
+2. Bare globals
+3. Elements
+4. Classes
+5. Pseudo-classes
+6. Pseudo-elements
+7. Attributes
+8. `@media`
+9. `@keyframes`
+
+## Properties
+
+- Sort properties lexicographically
+- Vendor prefixes last
+- `px` for all fixed measurements
 
 ## Naming
 
-BEM convention: `.block`, `.block__element`, `.block--modifier`.
-No bare tag selectors for custom styles. `:global()` scoped selectors are acceptable.
+- BEM: `.block`, `.block__element`, `.block--modifier`
+- Keyframes: `block__animation-name`
+- Bare tag selectors only in global styles
+
+## Layout
+
+- Desktop-first approach
+- `@media` queries for layout changes only
+- `clamp()` for fluid sizing, targeting 320–1280px
+
+## Spacing
+
+- Padding for internal element spacing
+- `margin-bottom` only for external element spacing
+- `gap` for flex and grid children
+- Consistent values across similar elements
+
+## Interactivity
+
+- Hover, focus, active, and disabled states on all interactive elements
+- Cursor must reflect interactivity
+- Consistent states across similar elements
+
+## Motion
+
+- `s` for all time values
+- Explicit transition properties
+- Shared durations and easing functions
 
 ## Formatting
 
-- No dead code: unused rules, unreachable selectors, redundant overrides
-- No duplicate properties
-- No deprecated properties
-- No comments
-- Minimize `@apply`. Prefer inline utilities.
 - 4-space indentation
-- Blank lines between `@keyframes` blocks
+- Single blank line between blocks
+- `!important` only for `prefers-reduced-motion`
+- Delete dead code and comments
 
-## Transitions
+## Tailwind
 
-All transitions must use a shared set of durations and easing functions. Flag mismatched values.
+- Prefer Tailwind over custom CSS
+- Inline styles only for runtime-computed values
 
-## Interactive States
+Sort classes lexicographically within each tier:
 
-All interactive elements must have visible hover and focus states. States must match across similar elements.
-
-## Responsiveness
-
-No overflow, clipping, or broken layouts at any viewport. Prefer `clamp()` over `@media` breakpoints. All clamp formulas target 320–1280px viewport range.
-
-## Tailwind Classes
-
-Sort classes in this order. No duplicate classes. Prefer Tailwind over custom CSS.
-
-1. **Custom/BEM**: `navbar`, `card__title`
-2. **Group/state**: `group`, `peer`, `block`, `hidden`
-3. **Position/layout**: `fixed`, `absolute`, `relative`, `flex`, `grid`, `items-*`, `justify-*`
-4. **Stacking**: `z-*`
-5. **Sizing**: `w-*`, `h-*`, `min-*`, `max-*`, `shrink-0`
-6. **Spacing**: `p-*`, `px-*`, `py-*`, `m-*`, `gap-*`
-7. **Borders**: `rounded-*`, `border`, `border-*`
-8. **Typography**: `font-*`, `text-*` size, `uppercase`, `tracking-*`, `leading-*`
-9. **Colors**: `bg-*`, `text-*` color, `placeholder-*`
-10. **Effects**: `overflow-*`, `opacity-*`, `-translate-*`, `backdrop-blur-*`, `shadow-*`
-11. **Interactions**: `transition-*`, `duration-*`, `outline-none`, `pointer-events-*`, `select-none`, `cursor-*`
-12. **Responsive**: `sm:*`, `md:*`, `lg:*`
+1. Custom
+2. State
+3. Layout
+4. Stacking
+5. Sizing
+6. Spacing
+7. Borders
+8. Typography
+9. Colors
+10. Effects
+11. Interactions
+12. Responsive
 
 ## Astro
 
-- At most one `<style>` block per `.astro` file
-- Define color theme tokens in `:root`. No hardcoded colors in component styles.
-
-## Rules
-
-- Only report files with issues
-- Report issues in a table with columns: File, Lines, Issue
-- Report only. No recommendations, no editorializing, no offering to fix.
-- Get user approval before making any fixes
-- No logic changes. Reorder and reformat only.
-- Run `bun run lint` after all changes are applied
+- One `<style>` block per `.astro` file

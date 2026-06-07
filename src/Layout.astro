@@ -2,6 +2,7 @@
 import '@fontsource/geist-sans/index.css';
 import { ClientRouter } from 'astro:transitions';
 
+import '@/global.css';
 import '@/styles.css';
 
 interface Props {
@@ -9,8 +10,8 @@ interface Props {
     title: string;
 }
 
-const { description, title } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const { description, title } = Astro.props;
 ---
 
 <!doctype html>
@@ -19,17 +20,18 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <title>{title}</title>
-        <meta content="Kevin Huang" name="author" />
         <meta content={description} name="description" />
+        <meta content="Kevin Huang" name="author" />
         <meta content="#09090b" name="theme-color" />
         <link href={canonicalUrl} rel="canonical" />
+        <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         <meta content={title} property="og:title" />
         <meta content={description} property="og:description" />
-        <meta content={canonicalUrl} property="og:url" />
-        <meta content="website" property="og:type" />
         <meta content={`${Astro.site}og.png`} property="og:image" />
+        <meta content={canonicalUrl} property="og:url" />
         <meta content="Dev" property="og:site_name" />
+        <meta content="website" property="og:type" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={title} name="twitter:title" />
         <meta content={description} name="twitter:description" />
@@ -39,7 +41,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
             set:html={JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
-                'founder': {
+                'author': {
                     '@type': 'Person',
                     'name': 'Kevin Huang',
                 },
@@ -51,38 +53,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <ClientRouter />
     </head>
     <body class="flex flex-col min-h-screen font-sans bg-zinc-950 text-white">
-        <main class="flex-1">
+        <main class="flex flex-1 flex-col">
             <slot />
         </main>
     </body>
 </html>
-
-<style is:global>
-    @import 'tailwindcss';
-
-    :root {
-        --color-indigo: 99, 102, 241;
-        --font-sans: 'Geist', system-ui, sans-serif;
-    }
-
-    :focus {
-        outline: none;
-    }
-
-    :focus-visible {
-        border-radius: 2px;
-        outline: 2px solid rgba(var(--color-indigo), 0.8);
-        outline-offset: 2px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            scroll-behavior: auto !important;
-            transition-duration: 0.01ms !important;
-        }
-    }
-</style>

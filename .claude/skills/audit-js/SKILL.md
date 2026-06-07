@@ -1,62 +1,81 @@
 ---
-description: Enforce JavaScript and TypeScript conventions in scripts and Astro files
+description: Enforce JS and TS conventions
 name: audit-js
 user-invocable: true
 ---
 
-Audit `.js`, `.ts`, `.tsx` files and frontmatter and `<script>` blocks in `.astro` files.
-Skip paths in `.gitignore`.
+- Audit `.js`, `.ts`, `.tsx` files, `<script>` blocks, and frontmatter in `.astro` files
+- Skip paths in `.gitignore`
+
+## Protocol
+
+- Report issues in a table with columns: ID, File, Lines, Issue
+- No editorializing
+- Fix only with user approval
 
 ## Ordering
 
-Sort all identifiers lexicographically, case-sensitive, uppercase before lowercase. This applies to variable declarations, object properties, interface properties, type properties, destructured bindings, and nested properties at all levels.
+Sort identifiers lexicographically at all levels, declarations in this order:
 
-Reorder top-level declarations in this sequence:
+1. Imports
+2. Types
+3. Constants
+4. Variables
+5. Functions
+6. Components
+7. Logic
+8. Exports
 
-1. **Imports**: three groups separated by blank lines: external, internal, types. Sort by binding name, ignoring braces. Sort destructured bindings within braces.
-2. **Types and interfaces**: types before interfaces. Sort properties.
-3. **Constants**: static values known at definition time
-4. **Variables**: derived or computed state
-5. **Helpers**: internal utility functions
-6. **Main logic**: primary functions and classes
-7. **Exports**: inline named exports at declaration, no `export default` or `export { }` blocks
+## Imports
 
-## Tests
-
-Order test cases by rendering order, not alphabetically.
+- Group in order of external, internal, and types
+- Sort lexicographically by binding name, ordered side-effect, default, and named
 
 ## Style
 
-- No `console.log` or `debugger`
-- No comments
-- No `.then()` chains. Use `async`/`await`.
-- Descriptive names. Flag ambiguous or abbreviated identifiers.
-- Prefer `const` over `let` when never reassigned
-- Prefer `function` declarations over arrows unless inline callbacks or `this`-binding
-- `for` and `while` loops always use braces and multiple lines
-- Avoid ternaries unless they fit on one line
-- 4-space indentation. Indent `<script>` content inside the tag in `.astro` files.
-- Blank lines around block elements: functions, if/else, for/while, try/catch, classes
-- Blank lines between logical groups but not between consecutive declarations in the same category
-- Consecutive single-line guards may stay grouped. Multi-line if blocks always need surrounding blank lines.
+- Concise, descriptive, and unabbreviated identifiers
+- `const` for all non-reassigned variables
+- Extract magic numbers to named constants
+- `function` declarations, arrows only for inline callbacks
+- Extract multi-statement inline handlers to named functions
+- Hoist functions to module level when no component scope needed
+- Deduplicate logic into utilities
+- Prefer `async`/`await` over `.then()` chains
+- Strict equality only
+- Numeric separators for 4+ digits
 
-## Safety
+## Formatting
 
-- No unchecked nullable access. Type narrowing must carry into closures.
-- No swallowed errors. Empty `catch` blocks must log or re-throw.
-- Never mutate parameters
-- Strict equality only: `===` and `!==`
-- No magic numbers. Extract to named constants.
+- 4-space indentation
+- Group independent declarations
+- Guards always separate from declarations
+- Single-line guards and returns may stay grouped
+- Braces on all multi-line blocks
+- Blank lines around blocks, returns, and between logical groups
+- Inline conditionals when both branches fit on one line
+- Alphabetize compound conditions
+- Encode non-standard characters as HTML entities in JSX and Unicode in JS
+- Delete dead code, logging, and comments
+
+## Types
+
+- Avoid explicit `any` and `!` assertions
+- Derive types from existing types
+- Type narrowing must carry into closures
+- Annotate returns only for exports, hooks, and widening tuples
+- Types before interfaces
+- Alphabetize union members
+- Shared types in `env.d.ts`
 
 ## Astro
 
-At most one `<script>` block per `.astro` file.
+- One `<script>` block per `.astro` file
 
-## Rules
+## React
 
-- Only report files with issues
-- Report issues in a table with columns: File, Lines, Issue
-- Report only. No recommendations, no editorializing, no offering to fix.
-- Get user approval before making any fixes
-- No logic changes. Reorder, rename, and reformat only.
-- Run `bun run lint` after all changes are applied
+- Functional components except class for error boundaries
+- Treat state and props as immutable
+- `useEffect` placed after all declarations, before return
+- `useEffect` cleanup for listeners, timers, and subscriptions
+- Event handlers named `handle{EventName}` and colocated in their component
+- Inline styles only for runtime-computed values
