@@ -1,9 +1,9 @@
-import { defineConfig } from 'astro/config';
 import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
 import robots from 'astro-robots-txt';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
 
 export default defineConfig({
     adapter: netlify(),
@@ -15,14 +15,8 @@ export default defineConfig({
         robots(),
         sitemap({ lastmod: new Date() }),
     ],
-    prefetch: {
-        defaultStrategy: 'hover',
-    },
     site: 'https://dev.aephonics.com',
     vite: {
-        optimizeDeps: {
-            exclude: ['astro/virtual-modules/prefetch.js'],
-        },
         plugins: [tailwind()],
     },
 });

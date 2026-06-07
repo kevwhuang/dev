@@ -16,7 +16,7 @@ describe('NotFound', () => {
         const html = await container.renderToString(NotFound);
 
         expect(html).toContain('href="/"');
-        expect(html).toContain('return');
+        expect(html).toContain('RETURN');
     });
 
     test('return link has aria-label', async () => {
