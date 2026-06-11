@@ -1,6 +1,7 @@
 {
     "permissions": {
         "allow": [
+            "Agent",
             "Bash",
             "Edit",
             "EnterPlanMode",
@@ -12,6 +13,7 @@
             "TodoWrite",
             "WebFetch",
             "WebSearch",
+            "Workflow",
             "Write",
             "mcp__ide__*",
             "mcp__supabase__*"
