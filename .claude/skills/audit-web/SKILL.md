@@ -25,12 +25,8 @@ user-invocable: true
 
 ## Accessibility
 
-- Semantic HTML with logical heading hierarchy
-- Alt text on all images or marked decorative
-- ARIA labels on elements without visible text
 - Keyboard navigable with visible focus indicators
 - Form inputs labeled, errors linked via `aria-describedby`
-- Decorative elements hidden from assistive technology
 - Descriptive page titles
 - Functional at 200% zoom
 
@@ -47,15 +43,13 @@ user-invocable: true
 - Spacing from design tokens
 - Typography hierarchy maintained
 - Icons match in style and sizing
-- Shared transition durations and easing
 - Loading and skeleton states for async content
 
 ## Interactivity
 
-- Hover, focus, active, and disabled states on all interactive elements
-- Form inputs validate inline with error messages
+- Forms validate on submit with inline error messages
 - Focus trapped in modals and restored on close
-- Rapid repeated clicks handled gracefully
+- No duplicate submissions or broken state from rapid repeated clicks
 - Smooth scroll with anchor offsets
 
 ## Responsiveness
@@ -65,7 +59,7 @@ user-invocable: true
 - Max-width container on large screens
 - Typography scales with readable line lengths
 - Images use `srcset` for responsive sizing
-- Touch targets minimum 48x48px
+- Touch targets minimum 48×48px
 
 ## Compatibility
 

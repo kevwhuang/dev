@@ -16,9 +16,11 @@ user-invocable: true
 ## Theme
 
 - All colors and fonts defined in `@theme`
-- Hex values for all colors
+- Tokens defined as 6- or 8-digit hex
+- Reference via `var()`, no raw color values outside `@theme`
+- `:root` for durations, dimensions, and layout constants
 - WCAG AA contrast: 4.5:1 for text, 3:1 for UI
-- Delete unused `@theme` tokens
+- Delete unused `@theme` and `:root` tokens
 
 ## Selectors
 
@@ -37,8 +39,8 @@ Sort declaration blocks lexicographically within each tier, pseudos follow their
 ## Properties
 
 - Sort properties lexicographically
-- Vendor prefixes last
-- `px` for all fixed measurements
+- No manual vendor prefixes
+- `px` or `rem` for fixed measurements, one dialect per repo
 
 ## Naming
 
@@ -48,8 +50,9 @@ Sort declaration blocks lexicographically within each tier, pseudos follow their
 
 ## Layout
 
-- Desktop-first approach
-- `@media` queries for layout changes only
+- Desktop-first, `max-width` exclusively
+- Two breakpoints only: `768px` and `1024px`
+- `@media` for layout changes only, `prefers-reduced-motion` the only non-width query
 - `clamp()` for fluid sizing, targeting 320–1280px
 
 ## Spacing
@@ -61,15 +64,16 @@ Sort declaration blocks lexicographically within each tier, pseudos follow their
 
 ## Interactivity
 
-- Hover, focus, active, and disabled states on all interactive elements
-- Cursor must reflect interactivity
+- Hover, active, and focus-visible states on all interactive elements
+- Disabled controls dimmed via `:disabled`
+- `cursor: pointer` on clickable non-link elements, `cursor: not-allowed` on disabled controls
 - Consistent states across similar elements
 
 ## Motion
 
 - `s` for all time values
 - Explicit transition properties
-- Shared durations and easing functions
+- `:root` duration tokens, shared easing functions, decorative loops exempt
 
 ## Formatting
 
@@ -81,7 +85,6 @@ Sort declaration blocks lexicographically within each tier, pseudos follow their
 ## Tailwind
 
 - Prefer Tailwind over custom CSS
-- Inline styles only for runtime-computed values
 
 Sort classes lexicographically within each tier:
 

@@ -22,8 +22,9 @@ user-invocable: true
 ## Markup
 
 - Semantic elements over `div`/`span`
-- One attribute per line when element has multiple attributes and children
-- Self-closing void elements
+- HTML entities for typographic glyphs
+- One attribute per line when an element has both multiple attributes and children
+- Self-close every childless element
 - 4-space indentation
 - Blank lines only between root-level elements
 - Delete comments

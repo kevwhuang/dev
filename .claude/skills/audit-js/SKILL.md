@@ -15,7 +15,7 @@ user-invocable: true
 
 ## Ordering
 
-Sort identifiers lexicographically at all levels, declarations in this order:
+Sort identifiers lexicographically at all levels unless dependency or semantic order overrides, declarations in this order:
 
 1. Imports
 2. Types
@@ -29,13 +29,13 @@ Sort identifiers lexicographically at all levels, declarations in this order:
 ## Imports
 
 - Group in order of external, internal, and types
-- Sort lexicographically by binding name, ordered side-effect, default, and named
+- Order side-effect, default, and named, each sorted by first binding
 
 ## Style
 
 - Concise, descriptive, and unabbreviated identifiers
 - `const` for all non-reassigned variables
-- Extract magic numbers to named constants
+- Extract magic numbers to named constants, `0` and `1` exempt
 - `function` declarations, arrows only for inline callbacks
 - Extract multi-statement inline handlers to named functions
 - Hoist functions to module level when no component scope needed
@@ -54,7 +54,9 @@ Sort identifiers lexicographically at all levels, declarations in this order:
 - Blank lines around blocks, returns, and between logical groups
 - Inline conditionals when both branches fit on one line
 - Alphabetize compound conditions
-- Encode non-standard characters as HTML entities in JSX and Unicode in JS
+- Sort destructuring declarations by first key or element
+- Array patterns stay positional
+- Encode typographic glyphs as HTML entities in JSX and `\u` escapes in JS
 - Delete dead code, logging, and comments
 
 ## Types

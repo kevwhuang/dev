@@ -8,4 +8,5 @@ export default defineConfig({
         port: 8888,
         reuseExistingServer: true,
     },
+    workers: 1,
 });

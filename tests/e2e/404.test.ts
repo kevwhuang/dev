@@ -9,6 +9,12 @@ test.describe('404 page', () => {
         await expect(page.locator('h1')).toContainText('404');
     });
 
+    test('returns 404 status', async ({ page }) => {
+        const response = await page.request.get('/this-page-does-not-exist');
+
+        expect(response.status()).toBe(404);
+    });
+
     test('has return link to home', async ({ page }) => {
         const link = page.locator('a[aria-label="Return to home"]');
 

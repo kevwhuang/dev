@@ -1,5 +1,6 @@
 ---
-import '@fontsource/geist-sans/index.css';
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/600.css';
 import { ClientRouter } from 'astro:transitions';
 
 import '@/global.css';
@@ -7,11 +8,13 @@ import '@/styles.css';
 
 interface Props {
     description: string;
+    noindex?: boolean;
     title: string;
 }
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
-const { description, title } = Astro.props;
+const { description, noindex, title } = Astro.props;
+const ogImageUrl = `${Astro.site}og.png`;
 ---
 
 <!doctype html>
@@ -23,19 +26,20 @@ const { description, title } = Astro.props;
         <meta content={description} name="description" />
         <meta content="Kevin Huang" name="author" />
         <meta content="#09090b" name="theme-color" />
+        <meta content={noindex ? 'noindex, nofollow' : 'index, follow'} name="robots" />
         <link href={canonicalUrl} rel="canonical" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         <meta content={title} property="og:title" />
         <meta content={description} property="og:description" />
-        <meta content={`${Astro.site}og.png`} property="og:image" />
+        <meta content={ogImageUrl} property="og:image" />
         <meta content={canonicalUrl} property="og:url" />
         <meta content="Dev" property="og:site_name" />
         <meta content="website" property="og:type" />
         <meta content="summary_large_image" name="twitter:card" />
         <meta content={title} name="twitter:title" />
         <meta content={description} name="twitter:description" />
-        <meta content={`${Astro.site}og.png`} name="twitter:image" />
+        <meta content={ogImageUrl} name="twitter:image" />
         <script
             is:inline
             set:html={JSON.stringify({
@@ -45,6 +49,7 @@ const { description, title } = Astro.props;
                     '@type': 'Person',
                     'name': 'Kevin Huang',
                 },
+                'inLanguage': 'en',
                 'name': 'Dev',
                 'url': Astro.site,
             })}
@@ -52,7 +57,7 @@ const { description, title } = Astro.props;
         />
         <ClientRouter />
     </head>
-    <body class="flex flex-col min-h-screen font-sans bg-zinc-950 text-white">
+    <body class="flex flex-col min-h-screen antialiased font-sans bg-zinc-950 text-white">
         <main class="flex flex-1 flex-col">
             <slot />
         </main>

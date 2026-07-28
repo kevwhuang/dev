@@ -1,5 +1,6 @@
 {
     "breadcrumbs.enabled": false,
+    "chat.titleBar.openInAgentsWindow.enabled": false,
     "editor.fontSize": 20,
     "editor.hover.enabled": "off",
     "editor.inlineSuggest.enabled": false,

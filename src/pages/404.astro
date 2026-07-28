@@ -1,13 +1,12 @@
 ---
+import ErrorNotFound from '@sections/ErrorNotFound.astro';
 import Layout from '@/Layout.astro';
-import NotFound from '@sections/NotFound.astro';
-
-export const prerender = false;
 ---
 
 <Layout
     description="The page you're looking for doesn't exist."
-    title="404 - Not Found"
+    noindex
+    title={'Page Not Found \u2014 Dev'}
 >
-    <NotFound />
+    <ErrorNotFound />
 </Layout>

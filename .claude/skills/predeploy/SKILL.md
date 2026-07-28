@@ -12,11 +12,12 @@ Run each step in order:
 4. `bun run lint` and fix issues
 5. `bun run test` and fix issues
 6. `bun run build` and fix issues
-7. Stage all files and commit if all steps pass
+7. If all steps pass, propose the commit message and stop
+8. After approval, `git add .` and commit
 
 ## Commit
 
-- Format: `type: lowercase description`
+- Format: `type: lowercase description`, starting with a verb
 - Types: `chore` | `content` | `feat` | `fix` | `init` | `refactor`
-- Concise and general when appropriate
+- Prefer one concise, general description over enumerating changes
 - Always include `Co-Authored-By: Claude <noreply@anthropic.com>`
