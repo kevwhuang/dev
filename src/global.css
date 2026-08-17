@@ -56,10 +56,10 @@ html[data-astro-transition] {
     *::after,
     *::before {
         animation-delay: 0s !important;
-        animation-duration: 0.01s !important;
+        animation-duration: 0.00001s !important;
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-delay: 0s !important;
-        transition-duration: 0.01s !important;
+        transition-duration: 0.00001s !important;
     }
 }

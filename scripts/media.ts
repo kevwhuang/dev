@@ -189,8 +189,11 @@ async function main() {
     const workers = Array.from({ length: CONCURRENCY }, () => processQueue(media, counts));
 
     await Promise.all(workers);
+
     report(counts);
+
     await finalize();
+
     console.log();
 }
 
@@ -271,6 +274,7 @@ async function preserve(photo: string) {
     const flags = await scrubFlags(photo);
 
     await $`exiftool ${flags} -overwrite_original ${photo}`.quiet();
+
     tally('preserve');
 
     return photo;
@@ -384,6 +388,7 @@ async function scrubVideo(video: string) {
     ];
 
     await $`exiftool ${flags} ${video}`.quiet();
+
     tally('video');
 
     return video;
@@ -414,9 +419,11 @@ async function transcode(file: string) {
         if (!prepared) return rollback(file, current);
 
         current = prepared;
+
         current = await transform(current);
 
         await normalizeTimestamps(current);
+
         COMPLETED.push({ backup: backupPath(file), final: current, original: file });
 
         return current;

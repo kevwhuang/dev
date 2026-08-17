@@ -5,6 +5,7 @@ export default defineConfig({
     testDir: 'tests/e2e',
     webServer: {
         command: 'bun start',
+        env: { ASTRO_DEV_BACKGROUND: '1' },
         port: 8888,
         reuseExistingServer: true,
     },

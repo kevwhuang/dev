@@ -107,8 +107,11 @@ async function main() {
     const workers = Array.from({ length: CONCURRENCY }, () => processQueue(photos, counts));
 
     await Promise.all(workers);
+
     report(counts);
+
     await finalize();
+
     console.log();
 }
 
