@@ -12,6 +12,7 @@
     "editor.scrollbar.horizontalScrollbarSize": 20,
     "editor.scrollbar.verticalScrollbarSize": 20,
     "editor.stickyScroll.enabled": false,
+    "editor.suggestOnTriggerCharacters": false,
     "editor.wordBasedSuggestions": "off",
     "extensions.ignoreRecommendations": true,
     "git.openRepositoryInParentFolders": "never",

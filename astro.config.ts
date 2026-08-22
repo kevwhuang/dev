@@ -7,6 +7,9 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
     adapter: netlify(),
+    build: {
+        format: 'file',
+    },
     devToolbar: {
         enabled: false,
     },
@@ -16,6 +19,7 @@ export default defineConfig({
         sitemap({ lastmod: new Date() }),
     ],
     site: 'https://dev.aephonics.com',
+    trailingSlash: 'never',
     vite: {
         plugins: [tailwind()],
     },

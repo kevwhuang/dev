@@ -5,6 +5,7 @@ import { ClientRouter } from 'astro:transitions';
 
 import '@/global.css';
 import '@/styles.css';
+import { ROUTES } from '@lib/constants';
 
 interface Props {
     description: string;
@@ -12,49 +13,75 @@ interface Props {
     title: string;
 }
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const canonicalUrl = new URL(Astro.routePattern, Astro.site);
+const currentRoute = ROUTES.find(route => route.href === Astro.routePattern);
 const { description, noindex, title } = Astro.props;
 const ogImageUrl = `${Astro.site}og.png`;
+
+const breadcrumbRoutes = currentRoute && currentRoute !== ROUTES[0] ? [ROUTES[0], currentRoute] : [];
+
+const breadcrumbList = {
+    '@type': 'BreadcrumbList',
+    'itemListElement': breadcrumbRoutes.map((route, index) => ({
+        '@type': 'ListItem',
+        'item': new URL(route.href, Astro.site).href,
+        'name': route.label,
+        'position': index + 1,
+    })),
+};
+
+const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+        ...(breadcrumbRoutes.length > 0 ? [breadcrumbList] : []),
+        {
+            '@type': 'ItemList',
+            'itemListElement': ROUTES.map((route, index) => ({
+                '@type': 'SiteNavigationElement',
+                'name': route.label,
+                'position': index + 1,
+                'url': new URL(route.href, Astro.site).href,
+            })),
+        },
+        {
+            '@type': 'WebSite',
+            'author': {
+                '@type': 'Person',
+                'name': 'Kevin Huang',
+            },
+            'inLanguage': 'en',
+            'name': 'Dev',
+            'url': Astro.site,
+        },
+    ],
+};
 ---
 
 <!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
         <title>{title}</title>
-        <meta content={description} name="description" />
         <meta content="Kevin Huang" name="author" />
-        <meta content="#09090b" name="theme-color" />
+        <meta content={description} name="description" />
         <meta content={noindex ? 'noindex, nofollow' : 'index, follow'} name="robots" />
-        <link href={canonicalUrl} rel="canonical" />
+        <meta content="#09090b" name="theme-color" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
+        <link href={canonicalUrl} rel="canonical" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-        <meta content={title} property="og:title" />
         <meta content={description} property="og:description" />
         <meta content={ogImageUrl} property="og:image" />
-        <meta content={canonicalUrl} property="og:url" />
+        <meta content="en_US" property="og:locale" />
         <meta content="Dev" property="og:site_name" />
+        <meta content={title} property="og:title" />
         <meta content="website" property="og:type" />
+        <meta content={canonicalUrl} property="og:url" />
         <meta content="summary_large_image" name="twitter:card" />
-        <meta content={title} name="twitter:title" />
         <meta content={description} name="twitter:description" />
         <meta content={ogImageUrl} name="twitter:image" />
-        <script
-            is:inline
-            set:html={JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'WebSite',
-                'author': {
-                    '@type': 'Person',
-                    'name': 'Kevin Huang',
-                },
-                'inLanguage': 'en',
-                'name': 'Dev',
-                'url': Astro.site,
-            })}
-            type="application/ld+json"
-        />
+        <meta content={title} name="twitter:title" />
+        <script is:inline set:html={JSON.stringify(structuredData)} type="application/ld+json" />
         <ClientRouter />
     </head>
     <body class="flex flex-col min-h-svh antialiased font-sans bg-zinc-950 text-white">
