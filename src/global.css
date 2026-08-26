@@ -8,10 +8,7 @@
     --color-white-20: #ffffff33;
     --color-white-40: #ffffff66;
     --color-white-60: #ffffff99;
-    --font-sans:
-        'Geist Sans',
-        system-ui,
-        sans-serif;
+    --font-sans: var(--font-geist-sans);
 }
 
 a,

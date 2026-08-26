@@ -4,7 +4,6 @@ import path from 'node:path';
 import { $ } from 'bun';
 
 type Completion = { backup: string; crops: string[]; original: string };
-type Counts = { failed: number; processed: number };
 
 const BACKUP_MARKER = '___backup___';
 const COMPLETED: Completion[] = [];
@@ -23,7 +22,7 @@ function backupPath(file: string) {
 }
 
 async function checkDependencies() {
-    if (!Bun.which('swiftc')) fail('Missing swiftc; install the Xcode CLT.');
+    if (!Bun.which('swiftc')) process.exit(1);
 
     await compile('crop.swift', CROPPER);
 }
@@ -50,9 +49,7 @@ async function compile(script: string, binary: string) {
 async function crop(photo: string) {
     const offsets = await measureOffsets(photo);
 
-    if (!offsets) {
-        return skip(`Skipped ${path.basename(photo)}; not tall enough for ${TARGET.width}x${TARGET.height}.`);
-    }
+    if (!offsets) return null;
 
     const crops: string[] = [];
 
@@ -61,11 +58,6 @@ async function crop(photo: string) {
     }
 
     return crops;
-}
-
-function fail(message: string) {
-    console.error(message);
-    process.exit(1);
 }
 
 async function finalize() {
@@ -78,8 +70,6 @@ async function finalize() {
 
         await $`/usr/bin/trash ${backups}`.quiet();
 
-        console.log('\nBackups trashed');
-
         return;
     }
 
@@ -90,8 +80,6 @@ async function finalize() {
 
         fs.renameSync(backup, original);
     }
-
-    console.log('\nReverted');
 }
 
 async function main() {
@@ -99,20 +87,12 @@ async function main() {
 
     const directory = resolveDirectory();
 
-    const counts = { failed: 0, processed: 0 };
     const photos = collectPhotos(directory);
 
-    if (photos.length > 0) console.log();
-
-    const workers = Array.from({ length: CONCURRENCY }, () => processQueue(photos, counts));
+    const workers = Array.from({ length: CONCURRENCY }, () => processQueue(photos));
 
     await Promise.all(workers);
-
-    report(counts);
-
     await finalize();
-
-    console.log();
 }
 
 async function measureOffsets(photo: string) {
@@ -142,23 +122,13 @@ async function normalizeTimestamps(file: string) {
     await $`/usr/bin/SetFile -d ${stamp} ${file}`.quiet();
 }
 
-async function processQueue(queue: string[], counts: Counts) {
+async function processQueue(queue: string[]) {
     while (queue.length > 0) {
         const file = queue.shift();
 
         if (!file) return;
 
-        const result = await transcode(file);
-
-        if (result) {
-            counts.processed++;
-
-            for (const crop of result) {
-                console.log(path.basename(crop));
-            }
-        } else {
-            counts.failed++;
-        }
+        await transcode(file);
     }
 }
 
@@ -168,7 +138,7 @@ async function readDimensions(photo: string) {
     const height = Number(/pixelHeight: (\d+)/.exec(output)?.[1]);
     const width = Number(/pixelWidth: (\d+)/.exec(output)?.[1]);
 
-    if (!height || !width) throw new Error('unreadable dimensions');
+    if (!height || !width) throw new Error('Unreadable dimensions.');
 
     return { height, width };
 }
@@ -185,25 +155,15 @@ async function render(photo: string, offset: number, position: number) {
     return output;
 }
 
-function report({ failed, processed }: Counts) {
-    if (failed === 0 && processed === 0) {
-        console.log('\nNo photos found');
-
-        return;
-    }
-
-    console.log(`\n${processed} processed, ${failed} failed`);
-}
-
 function resolveDirectory() {
     const input = process.argv[2];
 
-    if (!input) fail('Usage: bun scripts/instagram.ts <directory>');
+    if (!input) process.exit(1);
 
     const directory = path.resolve(input);
 
-    if (!fs.existsSync(directory)) fail(`Path not found: ${directory}`);
-    if (!fs.statSync(directory).isDirectory()) fail(`Not a directory: ${directory}`);
+    if (!fs.existsSync(directory)) process.exit(1);
+    if (!fs.statSync(directory).isDirectory()) process.exit(1);
 
     return directory;
 }
@@ -221,12 +181,6 @@ function rollback(file: string) {
     return null;
 }
 
-function skip(message: string) {
-    console.error(message);
-
-    return null;
-}
-
 async function transcode(file: string) {
     try {
         fs.copyFileSync(file, backupPath(file));
@@ -239,12 +193,8 @@ async function transcode(file: string) {
         COMPLETED.push({ backup: backupPath(file), crops, original: file });
 
         return crops;
-    } catch (error) {
-        rollback(file);
-
-        const message = error instanceof Error ? error.message : String(error);
-
-        return skip(`Failed ${path.basename(file)}; restored original: ${message}`);
+    } catch {
+        return rollback(file);
     }
 }
 

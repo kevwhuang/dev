@@ -12,7 +12,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
         return response;
     } catch {
-        if (isApi) return Response.json({ error: 'Internal server error' }, { status: 500 });
+        if (isApi) return Response.json({ error: 'Internal server error.' }, { status: 500 });
 
         return context.rewrite('/500');
     }

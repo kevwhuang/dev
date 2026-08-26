@@ -4,7 +4,6 @@ import path from 'node:path';
 import { $ } from 'bun';
 
 type Completion = { backup: string; final: string; original: string };
-type Counts = { failed: number; processed: number };
 type Size = { height: number; width: number };
 
 interface Geometry {
@@ -16,7 +15,6 @@ interface Geometry {
 
 const ASPECT = { height: 4, width: 3 };
 const BACKUP_MARKER = '___backup___';
-const COLUMN_GAP = 2;
 const COMPLETED: Completion[] = [];
 const CONCURRENCY = 4;
 const CREATION_TIME = '2026-01-01T12:00:00Z';
@@ -34,16 +32,8 @@ const KEEP_GAIN_MAP = [
 ];
 
 const KEEP_PROFILE = ['-all=', '-tagsfromfile', '@', '-icc_profile'];
-
-const LABELS: Record<string, string> = {
-    develop: 'Developed',
-    preserve: 'Preserved',
-    video: 'Videos',
-};
-
 const PHOTO_EXTENSIONS = new Set(['.heic', '.jpeg', '.jpg', '.png']);
 const STRIP_ALL = ['-all='];
-const TALLIES = new Map(['preserve', 'develop', 'video'].map(key => [key, 0]));
 const TARGET = { height: 4_800, width: 3_600 };
 const TRANSPOSED_ORIENTATION = 5;
 const VIDEO_EXTENSIONS = new Set(['.mov', '.mp4']);
@@ -55,8 +45,8 @@ function backupPath(file: string) {
 }
 
 async function checkDependencies() {
-    if (!Bun.which('exiftool')) fail('Missing exiftool; brew install it.');
-    if (!Bun.which('swiftc')) fail('Missing swiftc; install the Xcode CLT.');
+    if (!Bun.which('exiftool')) process.exit(1);
+    if (!Bun.which('swiftc')) process.exit(1);
 
     await compile('develop.swift', DEVELOPER);
 }
@@ -99,7 +89,7 @@ async function develop(photo: string, geometry: Geometry | null) {
     const developed = path.join(dir, `${name}.jpg`);
 
     if (developed !== photo && fs.existsSync(developed)) {
-        throw new Error(`${path.basename(developed)} already exists`);
+        throw new Error(`Cannot develop ${path.basename(photo)}; ${path.basename(developed)} already exists.`);
     }
 
     const { cropHeight = 0, cropWidth = 0, targetHeight = 0, targetWidth = 0 } = geometry ?? {};
@@ -109,8 +99,6 @@ async function develop(photo: string, geometry: Geometry | null) {
     await $`${DEVELOPER} ${flags}`.quiet();
 
     if (developed !== photo) fs.rmSync(photo);
-
-    tally('develop');
 
     return developed;
 }
@@ -124,18 +112,7 @@ function dropCollisions(names: string[]) {
         counts.set(stem, (counts.get(stem) ?? 0) + 1);
     }
 
-    return names.filter((name) => {
-        if (!isPhoto(name) || (counts.get(stemOf(name)) ?? 0) < 2) return true;
-
-        skip(`Cannot process ${name}; another photo shares its name.`);
-
-        return false;
-    });
-}
-
-function fail(message: string) {
-    console.error(message);
-    process.exit(1);
+    return names.filter(name => !isPhoto(name) || (counts.get(stemOf(name)) ?? 0) < 2);
 }
 
 async function finalize() {
@@ -148,8 +125,6 @@ async function finalize() {
 
         await $`/usr/bin/trash ${backups}`.quiet();
 
-        console.log('\nBackups trashed');
-
         return;
     }
 
@@ -158,8 +133,6 @@ async function finalize() {
 
         fs.renameSync(backup, original);
     }
-
-    console.log('\nReverted');
 }
 
 async function hasGainMap(photo: string) {
@@ -181,20 +154,12 @@ async function main() {
 
     const directory = resolveDirectory();
 
-    const counts = { failed: 0, processed: 0 };
     const media = collectMedia(directory);
 
-    if (media.length > 0) console.log();
-
-    const workers = Array.from({ length: CONCURRENCY }, () => processQueue(media, counts));
+    const workers = Array.from({ length: CONCURRENCY }, () => processQueue(media));
 
     await Promise.all(workers);
-
-    report(counts);
-
     await finalize();
-
-    console.log();
 }
 
 async function measureGeometry(photo: string) {
@@ -231,16 +196,14 @@ function normalizeFilename(file: string) {
     const cleanExtension = ext.toLowerCase().replace('.jpeg', '.jpg');
     const cleanName = cleanStem(name);
 
-    if (!cleanName) {
-        return skip(`Cannot normalize ${path.basename(file)}; the name is empty.`);
-    }
+    if (!cleanName) return null;
 
     const renamed = path.join(dir, cleanName + cleanExtension);
 
     if (renamed === file) return file;
 
     if (fs.existsSync(renamed) && fs.statSync(renamed).ino !== fs.statSync(file).ino) {
-        return skip(`Cannot rename ${path.basename(file)}; ${path.basename(renamed)} already exists.`);
+        return null;
     }
 
     fs.renameSync(file, renamed);
@@ -275,25 +238,16 @@ async function preserve(photo: string) {
 
     await $`exiftool ${flags} -overwrite_original ${photo}`.quiet();
 
-    tally('preserve');
-
     return photo;
 }
 
-async function processQueue(queue: string[], counts: Counts) {
+async function processQueue(queue: string[]) {
     while (queue.length > 0) {
         const file = queue.shift();
 
         if (!file) return;
 
-        const result = await transcode(file);
-
-        if (result) {
-            counts.processed++;
-            console.log(path.basename(result));
-        } else {
-            counts.failed++;
-        }
+        await transcode(file);
     }
 }
 
@@ -303,7 +257,7 @@ async function readDimensions(photo: string) {
     const height = Number(/pixelHeight: (\d+)/.exec(output)?.[1]);
     const width = Number(/pixelWidth: (\d+)/.exec(output)?.[1]);
 
-    if (!height || !width) throw new Error('unreadable dimensions');
+    if (!height || !width) throw new Error('Unreadable dimensions.');
 
     const orientation = await readOrientation(photo);
 
@@ -324,33 +278,15 @@ async function readProfile(photo: string) {
     return /profile: (.+)/.exec(output)?.[1] ?? '';
 }
 
-function report({ failed, processed }: Counts) {
-    if (failed === 0 && processed === 0) {
-        console.log('\nNo media found');
-
-        return;
-    }
-
-    const labels = Object.values(LABELS);
-
-    const columnWidth = Math.max(...labels.map(label => label.length)) + COLUMN_GAP;
-
-    console.log(`\n${processed} processed, ${failed} failed\n`);
-
-    for (const [kind, count] of TALLIES) {
-        console.log(`${(LABELS[kind] ?? kind).padEnd(columnWidth)}${count}`);
-    }
-}
-
 function resolveDirectory() {
     const input = process.argv[2];
 
-    if (!input) fail('Usage: bun scripts/media.ts <directory>');
+    if (!input) process.exit(1);
 
     const directory = path.resolve(input);
 
-    if (!fs.existsSync(directory)) fail(`Path not found: ${directory}`);
-    if (!fs.statSync(directory).isDirectory()) fail(`Not a directory: ${directory}`);
+    if (!fs.existsSync(directory)) process.exit(1);
+    if (!fs.statSync(directory).isDirectory()) process.exit(1);
 
     return directory;
 }
@@ -389,25 +325,13 @@ async function scrubVideo(video: string) {
 
     await $`exiftool ${flags} ${video}`.quiet();
 
-    tally('video');
-
     return video;
-}
-
-function skip(message: string) {
-    console.error(message);
-
-    return null;
 }
 
 function stemOf(name: string) {
     const stem = path.parse(name).name.split(BACKUP_MARKER)[0];
 
     return cleanStem(stem).toLowerCase();
-}
-
-function tally(kind: string) {
-    TALLIES.set(kind, (TALLIES.get(kind) ?? 0) + 1);
 }
 
 async function transcode(file: string) {
@@ -427,12 +351,8 @@ async function transcode(file: string) {
         COMPLETED.push({ backup: backupPath(file), final: current, original: file });
 
         return current;
-    } catch (error) {
-        rollback(file, current);
-
-        const message = error instanceof Error ? error.message : String(error);
-
-        return skip(`Failed ${path.basename(file)}; restored original: ${message}`);
+    } catch {
+        return rollback(file, current);
     }
 }
 

@@ -2,6 +2,7 @@
     "permissions": {
         "allow": [
             "Agent",
+            "Artifact",
             "Bash",
             "Edit",
             "EnterPlanMode",
@@ -16,7 +17,9 @@
             "WebSearch",
             "Workflow",
             "Write",
+            "mcp__computer-use__*",
             "mcp__ide__*",
+            "mcp__plugin_netlify-skills_netlify__*",
             "mcp__supabase__*"
         ]
     }
