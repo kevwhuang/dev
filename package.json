@@ -1,6 +1,6 @@
 {
     "name": "dev",
-    "version": "26.8.25",
+    "version": "26.9.7",
     "type": "module",
     "author": "Kevin Huang",
     "scripts": {
@@ -11,13 +11,13 @@
         "test": "vitest run && playwright test"
     },
     "dependencies": {
-        "@astrojs/netlify": "^8.2.4",
-        "@astrojs/react": "^6.0.4",
-        "@astrojs/sitemap": "^3.7.3",
+        "@astrojs/netlify": "^8.2.5",
+        "@astrojs/react": "^6.0.5",
+        "@astrojs/sitemap": "^3.7.4",
         "@netlify/blobs": "^10.7.13",
-        "@supabase/supabase-js": "^2.112.4",
+        "@supabase/supabase-js": "^2.115.0",
         "@tailwindcss/vite": "^4.3.3",
-        "astro": "^7.2.7",
+        "astro": "^7.3.1",
         "astro-robots-txt": "^1.0.0",
         "gsap": "^3.15.0",
         "react": "^19.2.8",
@@ -28,15 +28,15 @@
     "devDependencies": {
         "@astrojs/check": "^0.9.10",
         "@eslint/js": "^10.0.1",
-        "@playwright/test": "^1.62.1",
+        "@playwright/test": "^1.63.0",
         "@stylistic/eslint-plugin": "^5.10.0",
         "@types/react": "^19.2.18",
-        "bun-types": "^1.4.0",
-        "eslint": "^10.9.1",
+        "bun-types": "^1.4.2",
+        "eslint": "^10.10.0",
         "eslint-plugin-astro": "^3.1.0",
         "eslint-plugin-jsx-a11y": "^6.10.2",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.68.0",
+        "typescript-eslint": "^8.69.0",
         "vitest": "^4.1.11"
     }
 }
