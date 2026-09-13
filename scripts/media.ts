@@ -34,7 +34,12 @@ const KEEP_GAIN_MAP = [
 const KEEP_PROFILE = ['-all=', '-tagsfromfile', '@', '-icc_profile'];
 const PHOTO_EXTENSIONS = new Set(['.heic', '.jpeg', '.jpg', '.png']);
 const STRIP_ALL = ['-all='];
-const TARGET = { height: 4_800, width: 3_600 };
+
+const TARGETS = [
+    { height: 4_800, width: 3_600 },
+    { height: 3_600, width: 2_700 },
+];
+
 const TRANSPOSED_ORIENTATION = 5;
 const VIDEO_EXTENSIONS = new Set(['.mov', '.mp4']);
 
@@ -168,12 +173,14 @@ async function measureGeometry(photo: string) {
     const landscape = width > height;
 
     const aspect = landscape ? transpose(ASPECT) : ASPECT;
-    const target = landscape ? transpose(TARGET) : TARGET;
 
     const exact = height * aspect.width === width * aspect.height;
-    const small = height < target.height || width < target.width;
 
-    if (exact || small) return null;
+    const target = TARGETS.map(size => (landscape ? transpose(size) : size)).find(
+        size => height >= size.height && width >= size.width,
+    );
+
+    if (exact || !target) return null;
 
     const unit = Math.min(Math.floor(height / aspect.height), Math.floor(width / aspect.width));
 

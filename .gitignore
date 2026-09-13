@@ -7,6 +7,5 @@ TODO.md
 .playwright/
 dist/
 node_modules/
-prompts/
 supabase/.branches/
 supabase/.temp/
