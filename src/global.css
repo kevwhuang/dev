@@ -1,14 +1,44 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-indigo: #6366f1;
-    --color-indigo-20: #6366f133;
-    --color-indigo-80: #6366f1cc;
-    --color-white: #ffffff;
-    --color-white-20: #ffffff33;
-    --color-white-40: #ffffff66;
-    --color-white-60: #ffffff99;
-    --font-sans: var(--font-geist-sans);
+    --color-frost: #eef0f3;
+    --color-graphite: #20242c;
+    --color-graphite-light: #272b33;
+    --color-night: #0f1115;
+    --color-night-light: #171a20;
+    --color-silver: #b8bcc4;
+    --color-slate: #626770;
+    --color-slate-dark: #3a3f49;
+    --color-slate-light: #858b95;
+    --color-vermilion: #f2532f;
+    --color-vermilion-10: #f2532f1a;
+    --color-vermilion-bright: #ff9268;
+    --font-mono:
+        ui-monospace,
+        Menlo,
+        monospace;
+    --font-sans: var(--font-schibsted-grotesk);
+    --text-display: clamp(40px, calc(26.6667px + 4.1667vw), 80px);
+    --text-heading: clamp(24px, calc(20px + 1.25vw), 36px);
+    --text-hero: clamp(32px, 10vw, 128px);
+    --text-lead: clamp(20px, calc(17.3333px + 0.8333vw), 28px);
+    --text-numeral: clamp(96px, calc(21.3333px + 23.3333vw), 320px);
+    --text-prose: clamp(18px, calc(16px + 0.625vw), 24px);
+    --text-title: clamp(24px, calc(18.6667px + 1.6667vw), 40px);
+}
+
+:root {
+    --duration-base: 0.4s;
+    --duration-fast: 0.2s;
+    --gap-l: clamp(24px, calc(18.6667px + 1.6667vw), 40px);
+    --gap-m: clamp(20px, calc(16px + 1.25vw), 32px);
+    --header-height: 60px;
+    --measure-lead: 900px;
+    --measure-prose: 600px;
+    --section-padding: clamp(72px, calc(53.3333px + 5.8333vw), 128px);
+    --section-padding-tight: clamp(40px, calc(29.3333px + 3.3333vw), 72px);
+    --shell-pad: clamp(16px, calc(8px + 2.5vw), 40px);
+    --width-shell: 1280px;
 }
 
 a,
@@ -20,6 +50,8 @@ select {
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height);
+    touch-action: manipulation;
 }
 
 html[data-astro-transition] {
@@ -36,7 +68,7 @@ html[data-astro-transition] {
 
 :focus-visible:not(input, select, textarea) {
     border-radius: 2px;
-    outline: 2px solid var(--color-indigo-80);
+    outline: 2px solid var(--color-vermilion);
     outline-offset: 2px;
 }
 
@@ -45,7 +77,12 @@ html[data-astro-transition] {
 }
 
 ::selection {
-    background: var(--color-indigo-20);
+    background: var(--color-vermilion);
+    color: var(--color-night);
+}
+
+[data-scroll] {
+    opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

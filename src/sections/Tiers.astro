@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+
+import ProjectCard from '@components/ProjectCard.astro';
+import { TIERS } from '@lib/constants';
+
+const projects = await getCollection('projects');
+
+const tiers = TIERS.map(tier => ({
+    ...tier,
+    projects: projects
+        .filter(project => project.data.tier === tier.id)
+        .sort((first, second) => first.data.name.localeCompare(second.data.name)),
+}));
+---
+
+{tiers.map(tier => (
+    <section
+        class="tiers last-of-type:pb-(--section-padding) py-(--section-padding-tight)"
+        aria-labelledby={`tiers-${tier.id}-title`}
+    >
+        <div class="shell">
+            <h2
+                id={`tiers-${tier.id}-title`}
+                class="mb-(--gap-l) pt-6 border-t border-graphite-light font-bold leading-[1.1] text-heading tracking-[-0.04em]"
+                data-scroll
+            >
+                {tier.label}
+            </h2>
+            <ul
+                class="tiers__grid flex flex-wrap justify-center gap-8"
+                data-scroll
+                data-scroll-stagger="0.08"
+            >
+                {tier.projects.map(project => (
+                    <li class="basis-[calc(50%-16px)] min-w-0">
+                        <ProjectCard project={project.data} />
+                    </li>
+                ))}
+            </ul>
+        </div>
+    </section>
+))}
+
+<style>
+    @media (max-width: 768px) {
+        .tiers__grid > li {
+            flex-basis: 100%;
+        }
+    }
+</style>

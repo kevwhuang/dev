@@ -1,0 +1,8 @@
+{
+    "completed": "2026-06",
+    "description": "The scaffold every project on this page descends from. Build tooling, type checking, testing, CI, and security headers, configured once and proven across thirteen sites.",
+    "frames": 4,
+    "name": "Template",
+    "sector": "Infrastructure",
+    "tier": "dev"
+}

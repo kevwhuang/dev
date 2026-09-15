@@ -1,6 +1,6 @@
 {
     "name": "dev",
-    "version": "26.9.8",
+    "version": "26.9.15",
     "type": "module",
     "author": "Kevin Huang",
     "scripts": {
@@ -20,17 +20,18 @@
         "astro": "^7.3.2",
         "astro-robots-txt": "^1.0.0",
         "gsap": "^3.15.0",
-        "react": "^19.2.8",
-        "react-dom": "^19.2.8",
+        "react": "^19.3.0",
+        "react-dom": "^19.3.0",
+        "resend": "^6.28.0",
         "tailwindcss": "^4.3.3",
-        "vite": "^8.2.2"
+        "vite": "^8.3.0"
     },
     "devDependencies": {
         "@astrojs/check": "^0.9.10",
         "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.63.0",
         "@stylistic/eslint-plugin": "^5.10.0",
-        "@types/react": "^19.2.18",
+        "@types/react": "^19.3.0",
         "bun-types": "^1.4.2",
         "eslint": "^10.10.0",
         "eslint-plugin-astro": "^3.1.0",

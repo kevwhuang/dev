@@ -1,19 +1,54 @@
 ---
-
+import { CLASS_BUTTON, CLASS_ERROR_CODE } from '@lib/constants';
 ---
 
 <section
-    class="flex flex-1 items-center justify-center px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-24"
+    class="error-server section flex items-center min-h-[calc(100svh-var(--header-height))]"
     aria-labelledby="error-server-title"
 >
-    <div class="text-center select-none">
-        <h1 id="error-server-title" class="mb-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] font-sans font-semibold leading-none text-[clamp(6rem,calc(3rem+15vw),15rem)] tracking-widest bg-clip-text bg-linear-to-b from-white-60 text-transparent to-white-40">500</h1>
+    <div
+        class="error-server__grid shell grid gap-x-8"
+        data-scroll
+    >
+        <p
+            class={CLASS_ERROR_CODE}
+            aria-hidden="true"
+        >
+            500
+        </p>
+        <h1
+            id="error-server-title"
+            class="mb-(--gap-l) leading-[1.35] text-lead tracking-[-0.01em]"
+        >
+            <span class="sr-only">500: </span>
+            Server error. Try again shortly.
+        </h1>
         <a
-            class="active:opacity-70 hover:[text-shadow:0_0_20px_var(--color-indigo-80)] hover:bg-white-20 hover:border-indigo-80 hover:text-indigo-80 inline-block min-h-[clamp(2.75rem,calc(2.5rem+1.25vw),3.5rem)] px-[clamp(1.25rem,calc(1rem+1.25vw),2rem)] py-[clamp(0.875rem,calc(0.75rem+0.625vw),1.25rem)] border border-white-20 font-mono text-base tracking-[0.2em] uppercase text-white-60 duration-150 transition-[background,border-color,color,opacity,text-shadow]"
-            aria-label="Return to home"
+            class={CLASS_BUTTON}
             href="/"
         >
-            Return
+            Return home
         </a>
     </div>
 </section>
+
+<style>
+    .error-server__grid {
+        grid-template-columns: 1fr 3fr;
+    }
+
+    .error-server__grid > * {
+        grid-column-start: 2;
+        justify-self: start;
+    }
+
+    @media (max-width: 768px) {
+        .error-server__grid {
+            grid-template-columns: 1fr;
+        }
+
+        .error-server__grid > * {
+            grid-column-start: 1;
+        }
+    }
+</style>

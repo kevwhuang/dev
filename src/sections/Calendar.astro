@@ -1,0 +1,227 @@
+---
+import { getCollection } from 'astro:content';
+
+import { TIMEZONE } from '@lib/constants';
+
+interface Cell {
+    day: number;
+    key: string;
+    label: string;
+    place: string;
+    state: '' | keyof typeof STATE_CLASSES;
+}
+
+const BLANK_CELL = { day: 0, key: '', label: '', place: '', state: '' } as const;
+const CALENDAR_YEAR = 2_026;
+const CLASS_MONTH_BUTTON = 'calendar__button disabled:opacity-40 enabled:active:bg-vermilion-10 enabled:hover:border-vermilion enabled:hover:text-vermilion focus-visible:border-vermilion focus-visible:text-vermilion grid place-items-center size-12 border border-slate font-mono text-base text-frost duration-(--duration-fast) transition-[background-color,border-color,color,opacity] select-none';
+const DATE_PAD = 2;
+const DAYS_PER_WEEK = 7;
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as const;
+const SATURDAY = 6;
+
+const STATE_CLASSES = {
+    booked: 'text-slate-light',
+    open: 'text-frost',
+    past: 'text-slate-light',
+    traveling: 'bg-graphite text-frost',
+    weekend: 'text-slate-light',
+} as const;
+
+const SUNDAY = 0;
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
+const ranges = await getCollection('calendar');
+
+const today = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE }).format(new Date());
+
+const bookedRanges = ranges.filter(range => range.data.kind === 'booked');
+const [todayYear, todayMonth] = today.split('-');
+const travelRanges = ranges.filter(range => range.data.kind === 'travel');
+
+const initialMonth = Number(todayYear) === CALENDAR_YEAR ? Number(todayMonth) - 1 : 0;
+const months = MONTHS.map((_, index) => getCells(index));
+
+function getCells(month: number) {
+    const cells: Cell[] = [];
+    const dayCount = new Date(Date.UTC(CALENDAR_YEAR, month + 1, 0)).getUTCDate();
+    const firstWeekday = new Date(Date.UTC(CALENDAR_YEAR, month, 1)).getUTCDay();
+
+    for (let index = 0; index < firstWeekday; index++) {
+        cells.push(BLANK_CELL);
+    }
+
+    for (let day = 1; day <= dayCount; day++) {
+        const key = `${CALENDAR_YEAR}-${String(month + 1).padStart(DATE_PAD, '0')}-${String(day).padStart(DATE_PAD, '0')}`;
+        const weekday = new Date(Date.UTC(CALENDAR_YEAR, month, day)).getUTCDay();
+
+        const travelRange = travelRanges.find(range => key >= range.data.start && key <= range.data.end);
+
+        const place = travelRange && (day === 1 || key === travelRange.data.start || weekday === SUNDAY) ? travelRange.data.place ?? '' : '';
+        const state = getDayState(key, weekday, Boolean(travelRange));
+
+        const label = state === 'booked' || state === 'open' || state === 'traveling' ? state : '';
+
+        cells.push({ day, key, label, place, state });
+    }
+
+    while (cells.length % DAYS_PER_WEEK !== 0) {
+        cells.push(BLANK_CELL);
+    }
+
+    return cells;
+}
+
+function getDayState(key: string, weekday: number, isTraveling: boolean) {
+    if (key < today) return 'past';
+    if (isTraveling) return 'traveling';
+    if (weekday === SATURDAY || weekday === SUNDAY) return 'weekend';
+    if (bookedRanges.some(range => key >= range.data.start && key <= range.data.end)) return 'booked';
+
+    return 'open';
+}
+---
+
+<section
+    class="calendar section"
+    aria-labelledby="calendar-title"
+>
+    <div class="shell">
+        <div
+            class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 mb-(--gap-l) pt-6 border-t border-graphite-light"
+            data-scroll
+        >
+            <h2
+                id="calendar-title"
+                class="font-bold leading-[1.1] text-heading tracking-[-0.04em]"
+                aria-live="polite"
+            >
+                <span class="sr-only">Calendar: </span>
+                <span class="calendar__month">{MONTHS[initialMonth]}</span> {CALENDAR_YEAR}
+            </h2>
+            <div class="flex gap-2">
+                <button
+                    class={CLASS_MONTH_BUTTON}
+                    aria-label="Previous month"
+                    data-calendar-previous
+                    disabled={initialMonth === 0}
+                    type="button"
+                >
+                    &larr;
+                </button>
+                <button
+                    class={CLASS_MONTH_BUTTON}
+                    aria-label="Next month"
+                    data-calendar-next
+                    disabled={initialMonth === MONTHS.length - 1}
+                    type="button"
+                >
+                    &rarr;
+                </button>
+            </div>
+        </div>
+        <div
+            class="select-none"
+            data-scroll
+        >
+            <ul
+                class="grid grid-cols-7 pb-[10px] font-mono text-xs tracking-[0.14em] uppercase text-slate-light"
+                aria-hidden="true"
+            >
+                {WEEKDAYS.map(weekday => <li class="pl-[10px]">{weekday}</li>)}
+            </ul>
+            {months.map((cells, index) => (
+                <ul
+                    class="calendar__grid grid grid-cols-7 border-l border-t border-graphite-light"
+                    hidden={index !== initialMonth}
+                >
+                    {cells.map(cell => (
+                        <li
+                            class:list={[
+                                'calendar__day relative p-[10px] border-b border-r border-graphite-light',
+                                cell.state && STATE_CLASSES[cell.state],
+                            ]}
+                            aria-hidden={cell.day === 0 ? 'true' : undefined}
+                        >
+                            {cell.day !== 0 && (
+                                <time
+                                    class="font-mono text-sm"
+                                    datetime={cell.key}
+                                >
+                                    {cell.day}
+                                </time>
+                            )}
+                            {cell.label && <span class="sr-only">{cell.label}</span>}
+                            {cell.place && <span class="absolute bottom-[10px] inset-x-[10px] font-mono text-xs tracking-[0.14em] truncate uppercase text-frost">{cell.place}</span>}
+                        </li>
+                    ))}
+                </ul>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .calendar__day {
+        min-height: clamp(56px, calc(40px + 5vw), 104px);
+    }
+</style>
+
+<script>
+    const MONTHS = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+    ] as const;
+
+    let controller: AbortController | null = null;
+    let grids: HTMLElement[] = [];
+    let monthIndex = 0;
+    let monthLabel: HTMLElement | null = null;
+    let nextButton: HTMLButtonElement | null = null;
+    let previousButton: HTMLButtonElement | null = null;
+
+    function initCalendar() {
+        controller?.abort();
+        controller = new AbortController();
+        grids = Array.from(document.querySelectorAll<HTMLElement>('.calendar__grid'));
+        monthLabel = document.querySelector<HTMLElement>('.calendar__month');
+        nextButton = document.querySelector<HTMLButtonElement>('[data-calendar-next]');
+        previousButton = document.querySelector<HTMLButtonElement>('[data-calendar-previous]');
+
+        if (!grids.length || !monthLabel || !nextButton || !previousButton) return;
+
+        const { signal } = controller;
+
+        monthIndex = Math.max(0, grids.findIndex(grid => !grid.hidden));
+        nextButton.addEventListener('click', () => showMonth(monthIndex + 1), { signal });
+        previousButton.addEventListener('click', () => showMonth(monthIndex - 1), { signal });
+    }
+
+    function showMonth(index: number) {
+        if (!monthLabel || !nextButton || !previousButton) return;
+        if (index < 0 || index >= grids.length) return;
+
+        monthIndex = index;
+        monthLabel.textContent = MONTHS[index];
+        nextButton.disabled = index === grids.length - 1;
+        previousButton.disabled = index === 0;
+
+        if (document.activeElement === nextButton && nextButton.disabled) previousButton.focus();
+        if (document.activeElement === previousButton && previousButton.disabled) nextButton.focus();
+
+        grids.forEach((grid, gridIndex) => {
+            grid.hidden = gridIndex !== index;
+        });
+    }
+
+    document.addEventListener('astro:page-load', initCalendar);
+</script>

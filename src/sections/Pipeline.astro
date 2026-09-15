@@ -1,0 +1,249 @@
+---
+const CLASS_CARD = 'pipeline__card flex-1 grid min-w-0 gap-x-8 gap-y-2 px-5 py-4 border border-graphite-light bg-night duration-(--duration-fast) transition-colors';
+const NUMBER_LENGTH = 2;
+
+const STAGES = [
+    {
+        description: 'Every project starts from the same base repository \u2014 build tooling, type checking, tests, CI, and security headers already configured and proven across thirteen sites.',
+        name: 'Scaffolding',
+    },
+    {
+        description: 'The look is designed and approved as working HTML before it becomes a real site, so nothing is guessed at the end.',
+        name: 'Design',
+    },
+    {
+        description: 'The approved design is rebuilt properly. Colors and type become tokens, each part of the page becomes its own file, nothing is copy-pasted.',
+        name: 'Porting',
+    },
+    {
+        description: 'Polish passes against a written standard covering spacing, naming, structure, and file layout, until the code reads the same everywhere.',
+        name: 'Iteration',
+    },
+    {
+        description: 'The parts that do something \u2014 forms, logins, dashboards, payments, and the database behind them.',
+        name: 'Functionality',
+    },
+    {
+        description: 'Real words, real images, real data, modeled so it can change later without touching code.',
+        name: 'Content',
+    },
+    {
+        description: 'Sixty-plus named checks run across the whole codebase in parallel, each finding verified independently before anything changes.',
+        name: 'Audit',
+    },
+    {
+        description: 'Contrast, keyboard access, screen-reader semantics, and layout integrity checked at every screen width.',
+        name: 'Quality',
+    },
+    {
+        description: 'Motion and scroll behavior, built to degrade cleanly for anyone who has asked their device to reduce it.',
+        name: 'Interactivity',
+    },
+    {
+        description: 'A full test suite \u2014 unit, integration, and browser \u2014 runs as the gate. It ships when that passes.',
+        name: 'Deployment',
+    },
+] as const;
+
+const stages = STAGES.map((stage, index) => ({ ...stage, number: String(index + 1).padStart(NUMBER_LENGTH, '0') }));
+---
+
+<section
+    class="pipeline section"
+    aria-labelledby="pipeline-title"
+>
+    <div class="shell">
+        <h1
+            class="mb-(--gap-l) font-bold leading-[0.95] text-display tracking-[-0.04em]"
+            data-scroll
+        >
+            Eng
+        </h1>
+        <h2
+            id="pipeline-title"
+            class="mb-(--gap-l) pt-6 border-t border-graphite-light font-bold leading-[1.1] text-heading tracking-[-0.04em]"
+            data-scroll
+        >
+            Pipeline
+        </h2>
+        <div
+            class="pipeline__stages relative"
+            data-scroll
+        >
+            <div
+                class="pipeline__track absolute left-3 top-0 w-px bg-graphite-light"
+                aria-hidden="true"
+            >
+                <div class="pipeline__line absolute inset-0 bg-vermilion origin-top scale-y-0" />
+            </div>
+            <ol class="flex flex-col gap-3">
+                {stages.map(stage => (
+                    <li class="pipeline__stage flex gap-4">
+                        <div class="flex justify-center shrink-0 w-6 pt-4">
+                            <span class="pipeline__dot block size-2 border border-slate bg-night duration-(--duration-fast) transition-[background-color,border-color]" aria-hidden="true" />
+                        </div>
+                        <div class="flex flex-1 items-start min-w-0 gap-4">
+                            <span
+                                class="pipeline__number relative shrink-0 w-[1.25em] pt-2 font-bold leading-none text-heading tracking-[-0.04em] text-slate-dark select-none"
+                                aria-hidden="true"
+                                data-number={stage.number}
+                            >
+                                {stage.number}
+                            </span>
+                            <div class={CLASS_CARD}>
+                                <h3 class="font-bold leading-[1.4] text-xl tracking-tight wrap-anywhere">
+                                    <span class="sr-only">Stage {stage.number}: </span>
+                                    {stage.name}
+                                </h3>
+                                <p class="pipeline__description max-w-(--measure-prose) leading-[1.55] text-base text-pretty wrap-anywhere text-silver duration-(--duration-base) opacity-65 transition-opacity">{stage.description}</p>
+                            </div>
+                        </div>
+                    </li>
+                ))}
+            </ol>
+        </div>
+    </div>
+</section>
+
+<style>
+    .pipeline__card {
+        grid-template-columns: 224px minmax(0, 1fr);
+    }
+
+    .pipeline__number::before {
+        background: linear-gradient(180deg, var(--color-vermilion-bright) 0%, var(--color-vermilion) 100%);
+        background-clip: text;
+        color: transparent;
+        content: attr(data-number) / '';
+        inset: 8px 0 0;
+        opacity: 0;
+        position: absolute;
+        transition: opacity var(--duration-fast) ease;
+    }
+
+    .pipeline__stage--lit .pipeline__card {
+        border-color: var(--color-slate);
+    }
+
+    .pipeline__stage--lit .pipeline__description {
+        opacity: 1;
+    }
+
+    .pipeline__stage--lit .pipeline__dot {
+        background-color: var(--color-vermilion);
+        border-color: var(--color-vermilion);
+    }
+
+    .pipeline__stage--lit .pipeline__number::before {
+        opacity: 1;
+    }
+
+    .pipeline__stages--complete .pipeline__line {
+        transform: scaleY(1);
+    }
+
+    @media (max-width: 768px) {
+        .pipeline__card {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    import { REDUCED_MOTION_QUERY } from '@lib/constants';
+
+    const COMPLETE_CLASS = 'pipeline__stages--complete';
+    const DOT_SELECTOR = '.pipeline__dot';
+    const LIT_CLASS = 'pipeline__stage--lit';
+    const STAGES_SELECTOR = '.pipeline__stages';
+    const TRIGGER_POSITION = '60%';
+
+    const triggers: ScrollTrigger[] = [];
+
+    let lineHeight = 0;
+    let stagesObserver: ResizeObserver | null = null;
+
+    function initPipeline() {
+        teardownPipeline();
+
+        const stages = document.querySelector<HTMLElement>(STAGES_SELECTOR);
+
+        if (!stages) return;
+
+        const line = stages.querySelector<HTMLElement>('.pipeline__line');
+        const stageItems = stages.querySelectorAll<HTMLElement>('.pipeline__stage');
+
+        if (!line) return;
+
+        stagesObserver = new ResizeObserver(measureLine);
+        measureLine();
+        stagesObserver.observe(stages);
+
+        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+            stageItems.forEach(stage => stage.classList.add(LIT_CLASS));
+            stages.classList.add(COMPLETE_CLASS);
+
+            return;
+        }
+
+        const lineTween = gsap.fromTo(line, { scaleY: 0 }, {
+            ease: 'none',
+            scaleY: 1,
+            scrollTrigger: {
+                end: () => `+=${lineHeight}`,
+                onRefreshInit: measureLine,
+                scrub: true,
+                start: `top ${TRIGGER_POSITION}`,
+                trigger: stages,
+            },
+        });
+
+        if (lineTween.scrollTrigger) triggers.push(lineTween.scrollTrigger);
+
+        stageItems.forEach((stage) => {
+            const dot = stage.querySelector<HTMLElement>(DOT_SELECTOR);
+
+            if (!dot) return;
+
+            triggers.push(ScrollTrigger.create({
+                onEnter: () => stage.classList.add(LIT_CLASS),
+                onLeaveBack: () => stage.classList.remove(LIT_CLASS),
+                start: `center ${TRIGGER_POSITION}`,
+                trigger: dot,
+            }));
+        });
+    }
+
+    function measureLine() {
+        const stages = document.querySelector<HTMLElement>(STAGES_SELECTOR);
+        const track = document.querySelector<HTMLElement>('.pipeline__track');
+
+        if (!stages || !track) return;
+
+        const dots = stages.querySelectorAll<HTMLElement>(DOT_SELECTOR);
+
+        const lastDot = dots[dots.length - 1];
+
+        if (!lastDot) return;
+
+        const dotRect = lastDot.getBoundingClientRect();
+        const stagesTop = stages.getBoundingClientRect().top;
+
+        lineHeight = dotRect.top - stagesTop + dotRect.height / 2;
+        track.style.height = `${lineHeight}px`;
+    }
+
+    function teardownPipeline() {
+        stagesObserver?.disconnect();
+        stagesObserver = null;
+        triggers.forEach(trigger => trigger.kill());
+        triggers.length = 0;
+    }
+
+    document.addEventListener('astro:before-swap', teardownPipeline);
+    document.addEventListener('astro:page-load', initPipeline);
+    gsap.registerPlugin(ScrollTrigger);
+</script>

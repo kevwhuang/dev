@@ -1,0 +1,10 @@
+.section {
+    padding-block: var(--section-padding);
+}
+
+.shell {
+    margin-inline: auto;
+    max-width: var(--width-shell);
+    padding-inline: var(--shell-pad);
+    width: 100%;
+}

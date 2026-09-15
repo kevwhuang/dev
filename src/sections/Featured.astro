@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+
+const [featured] = await getCollection('projects', ({ data }) => data.featured);
+
+const { description, domain, name, sector } = featured.data;
+
+const pills = ['Development', sector];
+---
+
+<section
+    class="featured section"
+    aria-labelledby="featured-title"
+>
+    <div
+        class="shell"
+        data-scroll
+    >
+        <h2
+            id="featured-title"
+            class="sr-only"
+        >
+            Featured project
+        </h2>
+        <a
+            class="featured__card active:opacity-70 focus-visible:border-vermilion hover:border-vermilion grid border border-graphite-light text-frost duration-(--duration-fast) transition-[border-color,opacity]"
+            href={`https://${domain}`}
+            target="_blank"
+        >
+            <div
+                class="featured__preview relative min-w-0 bg-night-light shadow-[1px_1px_0_0_var(--color-graphite-light)] select-none"
+                aria-hidden="true"
+            >
+                <div class="absolute grid inset-4 overflow-hidden place-items-center border border-graphite-light">
+                    <span class="px-3 py-2 border border-slate font-mono text-xs tracking-[0.14em] uppercase bg-night-light text-frost">In progress</span>
+                </div>
+            </div>
+            <div class="flex flex-col justify-between min-w-0 gap-6 p-(--gap-l)">
+                <div class="flex flex-col gap-3">
+                    <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">Featured</span>
+                    <h3 class="font-bold leading-[1.1] text-balance text-title tracking-[-0.04em] wrap-anywhere">{name}</h3>
+                    <span class="inline-flex gap-2 font-mono text-xs tracking-[0.08em] text-slate-light">
+                        <span class="wrap-anywhere">{domain}</span>
+                        <span aria-hidden="true">&nearr;</span>
+                    </span>
+                    <p class="max-w-(--measure-prose) leading-[1.55] text-base text-pretty wrap-anywhere text-silver">{description}</p>
+                </div>
+                <ul class="flex flex-wrap gap-2">
+                    {pills.map(pill => (
+                        <li class="px-2 py-1 border border-graphite-light font-mono text-xs tracking-[0.14em] uppercase wrap-anywhere text-slate-light">{pill}</li>
+                    ))}
+                </ul>
+                <span class="sr-only">(opens in new tab)</span>
+            </div>
+        </a>
+    </div>
+</section>
+
+<style>
+    .featured__card {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+
+    @media (max-width: 768px) {
+        .featured__card {
+            grid-template-columns: 1fr;
+        }
+
+        .featured__preview {
+            aspect-ratio: 16 / 10;
+        }
+    }
+</style>

@@ -1,0 +1,42 @@
+---
+import { TIMEZONE } from '@lib/constants';
+
+const CLASS_INNER = 'shell flex flex-wrap items-center justify-between gap-x-8 gap-y-4 py-7 font-mono text-xs tracking-[0.08em] text-slate-light';
+
+const SOCIAL_LINKS = [
+    { href: 'https://github.com/kevwhuang', label: 'GitHub' },
+    { href: 'https://www.linkedin.com/in/kevwhuang', label: 'LinkedIn' },
+] as const;
+
+const year = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, year: 'numeric' }).format(new Date());
+---
+
+<footer class="footer border-t border-graphite-light">
+    <div class={CLASS_INNER}>
+        <p class="whitespace-nowrap">
+            &copy; <time datetime={year}>{year}</time>{' '}
+            <a
+                class="footer__link active:opacity-70 focus-visible:border-vermilion focus-visible:text-vermilion hover:border-vermilion hover:text-vermilion border-b border-slate text-silver duration-(--duration-fast) transition-[border-color,color,opacity]"
+                aria-label="Aephonics (opens in new tab)"
+                href="https://aephonics.com"
+                target="_blank"
+            >
+                Aephonics<span aria-hidden="true"> &nearr;</span>
+            </a>
+        </p>
+        <ul class="flex gap-6 tracking-[0.14em] uppercase">
+            {SOCIAL_LINKS.map(link => (
+                <li>
+                    <a
+                        class="footer__social active:opacity-70 focus-visible:text-vermilion hover:text-vermilion text-silver duration-(--duration-fast) transition-[color,opacity]"
+                        aria-label={`${link.label} (opens in new tab)`}
+                        href={link.href}
+                        target="_blank"
+                    >
+                        {link.label}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </div>
+</footer>

@@ -15,13 +15,13 @@ export default defineConfig({
     },
     fonts: [
         {
-            cssVariable: '--font-geist-sans',
+            cssVariable: '--font-schibsted-grotesk',
             display: 'block',
-            name: 'Geist Sans',
+            name: 'Schibsted Grotesk',
             provider: fontProviders.fontsource(),
             styles: ['normal'],
             subsets: ['latin'],
-            weights: [400, 600],
+            weights: [400, 700],
         },
     ],
     integrations: [

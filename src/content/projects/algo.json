@@ -1,0 +1,9 @@
+{
+    "completed": "2026-06",
+    "description": "A searchable reference of algorithm and data-structure solutions, several hundred entries deep, with instant client-side search across the whole index.",
+    "domain": "algo.aephonics.com",
+    "frames": 5,
+    "name": "Algo",
+    "sector": "Reference",
+    "tier": "dev"
+}

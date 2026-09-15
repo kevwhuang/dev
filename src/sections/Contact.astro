@@ -1,0 +1,307 @@
+---
+import { CLASS_BUTTON, CONTACT_EMAIL, EMAIL_MAX, MESSAGE_MAX, NAME_MAX } from '@lib/constants';
+
+const CLASS_INPUT = 'contact__input focus-visible:border-vermilion hover:border-silver min-h-12 w-full px-[14px] py-3 border border-slate leading-[1.4] text-base bg-transparent text-frost duration-(--duration-fast) transition-colors';
+const CLASS_TEXTAREA = 'contact__input focus-visible:border-vermilion hover:border-silver w-full px-[14px] py-3 border border-slate leading-[1.5] text-base bg-transparent text-frost duration-(--duration-fast) transition-colors resize-y';
+---
+
+<section
+    id="contact"
+    class="contact section"
+    aria-labelledby="contact-title"
+>
+    <div
+        class="shell"
+        data-scroll
+    >
+        <h2
+            id="contact-title"
+            class="sr-only"
+        >
+            Contact
+        </h2>
+        <p class="max-w-(--measure-lead) mb-(--gap-l) leading-[1.35] text-lead tracking-[-0.01em] text-frost">
+            <a
+                class="contact__email active:opacity-70 focus-visible:border-vermilion focus-visible:text-vermilion hover:border-vermilion hover:text-vermilion border-b border-slate duration-(--duration-fast) transition-[border-color,color,opacity]"
+                href={`mailto:${CONTACT_EMAIL}`}
+            >
+                {CONTACT_EMAIL}
+            </a>
+        </p>
+        <form
+            class="contact__form flex flex-col gap-5"
+            novalidate
+        >
+            <div class="contact__row grid grid-cols-2 gap-5">
+                <label class="flex flex-col gap-2">
+                    <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">
+                        Name <span class="text-vermilion">*</span>
+                    </span>
+                    <input
+                        class={CLASS_INPUT}
+                        aria-describedby="contact-name-error"
+                        autocomplete="name"
+                        maxlength={NAME_MAX}
+                        name="name"
+                        required
+                        type="text"
+                    />
+                    <p
+                        id="contact-name-error"
+                        class="contact__error font-mono text-xs tracking-[0.06em] text-vermilion"
+                        data-contact-name-error
+                        hidden
+                        role="alert"
+                    >
+                        Your name is required.
+                    </p>
+                </label>
+                <label class="flex flex-col gap-2">
+                    <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">
+                        Email <span class="text-vermilion">*</span>
+                    </span>
+                    <input
+                        class={CLASS_INPUT}
+                        aria-describedby="contact-email-error"
+                        autocomplete="email"
+                        maxlength={EMAIL_MAX}
+                        name="email"
+                        required
+                        type="email"
+                    />
+                    <p
+                        id="contact-email-error"
+                        class="contact__error font-mono text-xs tracking-[0.06em] text-vermilion"
+                        data-contact-email-error
+                        hidden
+                        role="alert"
+                    >
+                        Enter a valid email address.
+                    </p>
+                </label>
+            </div>
+            <label class="flex flex-col gap-2">
+                <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">
+                    Message <span class="text-vermilion">*</span>
+                </span>
+                <textarea
+                    class={CLASS_TEXTAREA}
+                    aria-describedby="contact-message-error"
+                    maxlength={MESSAGE_MAX}
+                    name="message"
+                    required
+                    rows="6"
+                />
+                <p
+                    id="contact-message-error"
+                    class="contact__error font-mono text-xs tracking-[0.06em] text-vermilion"
+                    data-contact-message-error
+                    hidden
+                    role="alert"
+                >
+                    A message is required.
+                </p>
+            </label>
+            <label
+                class="sr-only"
+                aria-hidden="true"
+            >
+                <span>Company</span>
+                <input
+                    autocomplete="off"
+                    name="company"
+                    tabindex="-1"
+                    type="text"
+                />
+            </label>
+            <div class="flex flex-wrap items-center gap-5">
+                <button
+                    class={CLASS_BUTTON}
+                    type="submit"
+                >
+                    Send message
+                </button>
+                <p
+                    class="contact__status font-mono text-xs tracking-[0.14em] uppercase text-slate-light"
+                    hidden
+                    role="status"
+                >
+                    Sending
+                </p>
+            </div>
+            <p
+                class="contact__success px-[18px] py-4 border border-slate leading-[1.5] text-frost"
+                hidden
+                role="status"
+            >
+                <span class="block mb-2 font-mono text-xs tracking-[0.14em] uppercase text-vermilion">Sent</span>
+                Message sent.
+            </p>
+            <p
+                class="contact__failure px-[18px] py-4 border border-vermilion leading-[1.5] text-frost"
+                hidden
+                role="alert"
+            >
+                <span class="block mb-2 font-mono text-xs tracking-[0.14em] uppercase text-vermilion">Error</span>
+                Not sent. Email{' '}
+                <a
+                    class="contact__email active:opacity-70 focus-visible:border-vermilion focus-visible:text-vermilion hover:border-vermilion hover:text-vermilion border-b border-slate duration-(--duration-fast) transition-[border-color,color,opacity]"
+                    href={`mailto:${CONTACT_EMAIL}`}
+                >
+                    {CONTACT_EMAIL}
+                </a>.
+            </p>
+        </form>
+    </div>
+</section>
+
+<style>
+    @media (max-width: 768px) {
+        .contact__row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    import { EMAIL_PATTERN } from '@lib/constants';
+
+    interface ContactRefs {
+        companyInput: HTMLInputElement;
+        emailError: HTMLElement;
+        emailInput: HTMLInputElement;
+        failurePanel: HTMLElement;
+        messageError: HTMLElement;
+        messageInput: HTMLTextAreaElement;
+        nameError: HTMLElement;
+        nameInput: HTMLInputElement;
+        statusPanel: HTMLElement;
+        submitButton: HTMLButtonElement;
+        successPanel: HTMLElement;
+    }
+
+    let controller: AbortController;
+
+    function clearErrors(refs: ContactRefs) {
+        setFieldError(refs.emailInput, refs.emailError, false);
+        setFieldError(refs.messageInput, refs.messageError, false);
+        setFieldError(refs.nameInput, refs.nameError, false);
+    }
+
+    async function handleSubmit(refs: ContactRefs, event: SubmitEvent) {
+        event.preventDefault();
+
+        const email = refs.emailInput.value.trim();
+        const message = refs.messageInput.value.trim();
+        const name = refs.nameInput.value.trim();
+
+        const isEmailValid = EMAIL_PATTERN.test(email);
+        const isMessageValid = message.length > 0;
+        const isNameValid = name.length > 0;
+
+        setFieldError(refs.emailInput, refs.emailError, !isEmailValid);
+        setFieldError(refs.messageInput, refs.messageError, !isMessageValid);
+        setFieldError(refs.nameInput, refs.nameError, !isNameValid);
+
+        if (!isNameValid) {
+            refs.nameInput.focus();
+
+            return;
+        }
+
+        if (!isEmailValid) {
+            refs.emailInput.focus();
+
+            return;
+        }
+
+        if (!isMessageValid) {
+            refs.messageInput.focus();
+
+            return;
+        }
+
+        refs.failurePanel.hidden = true;
+        refs.statusPanel.hidden = false;
+        refs.submitButton.disabled = true;
+        refs.successPanel.hidden = true;
+
+        try {
+            const response = await fetch('/api/contact', {
+                body: JSON.stringify({
+                    company: refs.companyInput.value,
+                    email,
+                    message,
+                    name,
+                }),
+                headers: { 'Content-Type': 'application/json' },
+                method: 'POST',
+            });
+
+            showResult(refs, response.ok);
+        } catch {
+            showResult(refs, false);
+        } finally {
+            refs.statusPanel.hidden = true;
+        }
+    }
+
+    function initContact() {
+        if (controller) controller.abort();
+
+        controller = new AbortController();
+
+        const form = document.querySelector<HTMLFormElement>('.contact__form');
+
+        if (!form) return;
+
+        const companyInput = form.querySelector<HTMLInputElement>('input[name="company"]');
+        const emailError = form.querySelector<HTMLElement>('[data-contact-email-error]');
+        const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]');
+        const failurePanel = form.querySelector<HTMLElement>('.contact__failure');
+        const messageError = form.querySelector<HTMLElement>('[data-contact-message-error]');
+        const messageInput = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+        const nameError = form.querySelector<HTMLElement>('[data-contact-name-error]');
+        const nameInput = form.querySelector<HTMLInputElement>('input[name="name"]');
+        const statusPanel = form.querySelector<HTMLElement>('.contact__status');
+        const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+        const successPanel = form.querySelector<HTMLElement>('.contact__success');
+
+        if (!companyInput || !emailError || !emailInput || !failurePanel || !statusPanel) return;
+        if (!messageError || !messageInput || !nameError || !nameInput || !submitButton || !successPanel) return;
+
+        const refs: ContactRefs = {
+            companyInput,
+            emailError,
+            emailInput,
+            failurePanel,
+            messageError,
+            messageInput,
+            nameError,
+            nameInput,
+            statusPanel,
+            submitButton,
+            successPanel,
+        };
+
+        emailInput.addEventListener('input', () => clearErrors(refs), { signal: controller.signal });
+        form.addEventListener('submit', event => handleSubmit(refs, event), { signal: controller.signal });
+        messageInput.addEventListener('input', () => clearErrors(refs), { signal: controller.signal });
+        nameInput.addEventListener('input', () => clearErrors(refs), { signal: controller.signal });
+    }
+
+    function setFieldError(control: HTMLInputElement | HTMLTextAreaElement, error: HTMLElement, isInvalid: boolean) {
+        error.hidden = !isInvalid;
+
+        if (isInvalid) control.setAttribute('aria-invalid', 'true');
+        else control.removeAttribute('aria-invalid');
+    }
+
+    function showResult(refs: ContactRefs, isSent: boolean) {
+        refs.failurePanel.hidden = isSent;
+        refs.submitButton.disabled = isSent;
+        refs.successPanel.hidden = !isSent;
+    }
+
+    document.addEventListener('astro:page-load', initContact);
+</script>

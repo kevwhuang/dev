@@ -1,0 +1,44 @@
+---
+const CLASS_CHIP = 'inline-block mb-4 px-2 py-1 border border-slate font-mono text-xs tracking-[0.14em] uppercase text-silver';
+---
+
+<section
+    class="about section"
+    aria-labelledby="about-title"
+>
+    <div class="shell">
+        <h2
+            id="about-title"
+            class="sr-only"
+        >
+            About
+        </h2>
+        <div
+            class="about__grid grid gap-x-8 gap-y-7"
+            data-scroll
+        >
+            <div
+                class="about__portrait grid place-items-center aspect-[4/5] max-w-[400px] border border-graphite-light bg-night-light select-none"
+                aria-hidden="true"
+            >
+                <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">Portrait</span>
+            </div>
+            <div class="max-w-[800px] p-(--gap-m) border border-dashed border-slate">
+                <span class={CLASS_CHIP}>Bio pending</span>
+                <p class="leading-[1.45] text-pretty text-prose tracking-[-0.01em] text-frost">One point of contact from first call to launch. Every project runs the same pipeline, on tooling I maintain across every site.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .about__grid {
+        grid-template-columns: 1fr 3fr;
+    }
+
+    @media (max-width: 768px) {
+        .about__grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

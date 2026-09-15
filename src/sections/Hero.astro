@@ -1,0 +1,236 @@
+---
+import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constants';
+---
+
+<section
+    class="hero flex flex-col justify-end min-h-[calc(100svh-var(--header-height))] pb-(--section-padding-tight)"
+    aria-labelledby="hero-title"
+>
+    <div class="shell">
+        <h1
+            id="hero-title"
+            class="hero__title mb-(--gap-l) font-bold leading-[0.95] text-hero tracking-[-0.04em] whitespace-nowrap"
+            aria-label="Web Engineering"
+        >
+            <span class="text-vermilion">W</span>
+            <span class="hero__fold inline-block overflow-x-clip whitespace-pre"><span class="hero__fold-text inline-block">eb </span></span>
+            <span class="text-vermilion">E</span>
+            <span class="hero__fold inline-block overflow-x-clip whitespace-pre"><span class="hero__fold-text inline-block">ngineering</span></span>
+        </h1>
+        <div class="hero__body">
+            <p class="hero__subtitle max-w-(--measure-prose) mb-(--gap-l) leading-[1.5] text-prose text-silver">I'm Kevin Huang. I design, build, and ship production websites &mdash; scaffolding through deployment &mdash; from Austin, Texas.</p>
+            <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+                <div class="flex flex-wrap gap-3">
+                    <a
+                        class={CLASS_BUTTON}
+                        href="/work"
+                    >
+                        View work
+                    </a>
+                    <a
+                        class={CLASS_BUTTON}
+                        href="#contact"
+                    >
+                        Get in touch
+                    </a>
+                </div>
+                <p class="flex gap-[14px] font-mono text-xs tracking-[0.14em] uppercase whitespace-nowrap text-slate-light">
+                    <span>Austin, Texas</span>
+                    <span class="hero__clock tabular-nums text-silver select-none">Central Time</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero--folded .hero__body > * {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    .hero--folded .hero__fold {
+        width: 0;
+    }
+
+    .hero--folded .hero__fold-text {
+        opacity: 0;
+        transform: translateX(-0.6em);
+    }
+</style>
+
+<script
+    define:vars={{ heroShownKey: HERO_SHOWN_KEY, reducedMotionQuery: REDUCED_MOTION_QUERY }}
+    is:inline
+>
+    const FOLDED_CLASS = 'hero--folded';
+
+    function initHeroFold() {
+        if (document.readyState !== 'loading') return;
+
+        const hero = document.querySelector('.hero');
+
+        if (!hero) return;
+
+        let hasShownHero;
+
+        try {
+            hasShownHero = Boolean(sessionStorage.getItem(heroShownKey));
+        } catch {
+            hasShownHero = false;
+        }
+
+        if (hasShownHero || window.matchMedia(reducedMotionQuery).matches) return;
+
+        hero.classList.add(FOLDED_CLASS);
+    }
+
+    initHeroFold();
+</script>
+
+<script>
+    import gsap from 'gsap';
+
+    import { HERO_SHOWN_KEY, REDUCED_MOTION_QUERY, TIMEZONE } from '@lib/constants';
+
+    const BEAT_DELAY = 1_100;
+    const BODY_CHILDREN_SELECTOR = '.hero__body > *';
+    const BODY_DELAY = 0.65;
+    const BODY_DURATION = 0.7;
+    const BODY_EASE = 'power2.out';
+    const BODY_STAGGER = 0.2;
+    const CLOCK_INTERVAL = 1_000;
+    const CLOCK_SELECTOR = '.hero__clock';
+    const FOLDED_CLASS = 'hero--folded';
+    const FOLD_DURATION = 1.1;
+    const FOLD_EASE = 'power3.inOut';
+    const FOLD_SELECTOR = '.hero__fold';
+    const FOLD_TEXT_DELAY = 0.2;
+    const FOLD_TEXT_DURATION = 0.7;
+    const FOLD_TEXT_SELECTOR = '.hero__fold-text';
+    const HERO_SELECTOR = '.hero';
+
+    let beatTimer: ReturnType<typeof setTimeout>;
+    let clock: HTMLElement | null;
+    let clockTimer: ReturnType<typeof setInterval>;
+    let timeline: gsap.core.Timeline;
+
+    function completeHero(hero: HTMLElement, targets: HTMLElement[]) {
+        gsap.set(targets, { clearProps: 'all' });
+        hero.classList.remove(FOLDED_CLASS);
+    }
+
+    function foldHero() {
+        const hero = document.querySelector<HTMLElement>(HERO_SELECTOR);
+
+        if (!hero) return;
+        if (hasShownHero() || window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+        hero.classList.add(FOLDED_CLASS);
+    }
+
+    function handleFocusIn(event: FocusEvent) {
+        const { target } = event;
+
+        if (!(target instanceof Element)) return;
+
+        const hero = target.closest<HTMLElement>(HERO_SELECTOR);
+
+        if (!hero || !hero.classList.contains(FOLDED_CLASS)) return;
+
+        clearTimeout(beatTimer);
+        markHeroShown();
+        timeline?.kill();
+        completeHero(hero, [...hero.querySelectorAll<HTMLElement>(`${BODY_CHILDREN_SELECTOR}, ${FOLD_SELECTOR}, ${FOLD_TEXT_SELECTOR}`)]);
+    }
+
+    function hasShownHero() {
+        try {
+            return Boolean(sessionStorage.getItem(HERO_SHOWN_KEY));
+        } catch {
+            return false;
+        }
+    }
+
+    function initHero() {
+        const hero = document.querySelector<HTMLElement>(HERO_SELECTOR);
+
+        teardownHero();
+
+        if (!hero) return;
+
+        clock = hero.querySelector<HTMLElement>(CLOCK_SELECTOR);
+        clockTimer = setInterval(updateClock, CLOCK_INTERVAL);
+        updateClock();
+
+        if (!hero.classList.contains(FOLDED_CLASS)) return;
+
+        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+            hero.classList.remove(FOLDED_CLASS);
+
+            return;
+        }
+
+        resolveHero(hero);
+    }
+
+    function markHeroShown() {
+        try {
+            sessionStorage.setItem(HERO_SHOWN_KEY, '1');
+        } catch {
+            return;
+        }
+    }
+
+    async function resolveHero(hero: HTMLElement) {
+        const bodyChildren = hero.querySelectorAll<HTMLElement>(BODY_CHILDREN_SELECTOR);
+        const foldTexts = hero.querySelectorAll<HTMLElement>(FOLD_TEXT_SELECTOR);
+        const folds = hero.querySelectorAll<HTMLElement>(FOLD_SELECTOR);
+
+        const targets = [...bodyChildren, ...folds, ...foldTexts];
+
+        await document.fonts.ready;
+
+        await new Promise((resolve) => {
+            beatTimer = setTimeout(resolve, BEAT_DELAY);
+        });
+
+        markHeroShown();
+
+        const widths = Array.from(folds, fold => fold.scrollWidth);
+
+        timeline = gsap.timeline({ onComplete: () => completeHero(hero, targets) });
+
+        timeline
+            .to(folds, { duration: FOLD_DURATION, ease: FOLD_EASE, width: (index: number) => widths[index] }, 0)
+            .to(foldTexts, { duration: FOLD_DURATION, ease: FOLD_EASE, x: 0 }, 0)
+            .to(foldTexts, { duration: FOLD_TEXT_DURATION, opacity: 1 }, FOLD_TEXT_DELAY)
+            .to(bodyChildren, { duration: BODY_DURATION, ease: BODY_EASE, opacity: 1, stagger: BODY_STAGGER, y: 0 }, BODY_DELAY);
+    }
+
+    function teardownHero() {
+        clock = null;
+        clearInterval(clockTimer);
+        clearTimeout(beatTimer);
+        timeline?.kill();
+    }
+
+    function updateClock() {
+        if (!clock) return;
+
+        const time = new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            hour12: false,
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: TIMEZONE,
+        });
+
+        clock.textContent = `${time} CT`;
+    }
+
+    document.addEventListener('astro:after-swap', foldHero);
+    document.addEventListener('astro:before-swap', teardownHero);
+    document.addEventListener('astro:page-load', initHero);
+    document.addEventListener('focusin', handleFocusIn);
+</script>

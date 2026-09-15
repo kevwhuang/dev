@@ -1,0 +1,9 @@
+{
+    "completed": "2026-08",
+    "description": "An interactive world map built on MapLibre GL with self-hosted Protomaps vector tiles. No third-party map service, no API key, no usage bill.",
+    "domain": "travel.aephonics.com",
+    "frames": 6,
+    "name": "Travel",
+    "sector": "Personal",
+    "tier": "creative"
+}

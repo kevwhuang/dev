@@ -4,6 +4,8 @@ import { Font } from 'astro:assets';
 
 import '@/global.css';
 import '@/styles.css';
+import Footer from '@sections/Footer.astro';
+import Navbar from '@sections/Navbar.astro';
 import { ROUTES } from '@lib/constants';
 
 interface Props {
@@ -64,7 +66,7 @@ const structuredData = {
         <meta content="Kevin Huang" name="author" />
         <meta content={description} name="description" />
         <meta content={noindex ? 'noindex, nofollow' : 'index, follow'} name="robots" />
-        <meta content="#09090b" name="theme-color" />
+        <meta content="#0f1115" name="theme-color" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
         <link href={canonicalUrl} rel="canonical" />
@@ -81,12 +83,20 @@ const structuredData = {
         <meta content={ogImageUrl} name="twitter:image" />
         <meta content={title} name="twitter:title" />
         <script is:inline set:html={JSON.stringify(structuredData)} type="application/ld+json" />
-        <Font cssVariable="--font-geist-sans" preload />
+        <Font cssVariable="--font-schibsted-grotesk" preload />
         <ClientRouter />
     </head>
-    <body class="flex flex-col min-h-svh antialiased bg-zinc-950 text-white">
+    <body class="flex flex-col min-h-svh pt-(--header-height) antialiased bg-night text-frost">
+        <Navbar />
         <main class="flex flex-1 flex-col">
             <slot />
         </main>
+        <Footer />
     </body>
 </html>
+
+<script>
+    import { initMotion } from '@lib/motion';
+
+    document.addEventListener('astro:page-load', initMotion);
+</script>

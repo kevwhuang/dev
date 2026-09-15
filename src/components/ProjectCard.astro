@@ -1,0 +1,172 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+    project: CollectionEntry<'projects'>['data'];
+}
+
+const CLASS_FRAME = 'project-card__frame absolute flex flex-col inset-0 justify-between p-4 font-mono text-xs tracking-[0.14em] uppercase text-slate-light duration-(--duration-base) opacity-0 transition-opacity';
+const PAD_LENGTH = 2;
+
+const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC', year: 'numeric' });
+const { project } = Astro.props;
+
+const completedLabel = project.completed ? monthFormatter.format(new Date(`${project.completed}-01T00:00:00Z`)) : '';
+const frameCount = project.completed ? (project.frames ?? 0) : 0;
+
+const frameTotal = String(frameCount).padStart(PAD_LENGTH, '0');
+
+const frames = Array.from({ length: frameCount }, (_, index) => ({
+    label: `${String(index + 1).padStart(PAD_LENGTH, '0')} / ${frameTotal}`,
+    width: `${((index + 1) / frameCount * 100).toFixed(1)}%`,
+}));
+
+const Tag = project.domain ? 'a' : 'article';
+---
+
+<Tag
+    class:list={[
+        'project-card flex flex-col h-full border border-graphite-light bg-night text-frost',
+        project.domain && 'active:opacity-70 focus-visible:border-vermilion hover:border-vermilion duration-(--duration-fast) transition-[border-color,opacity]',
+    ]}
+    href={project.domain ? `https://${project.domain}` : undefined}
+    target={project.domain ? '_blank' : undefined}
+>
+    <div
+        class="overflow-hidden relative aspect-[16/10] border-b border-graphite-light bg-night-light select-none"
+        aria-hidden="true"
+    >
+        {!project.completed && (
+            <div class="absolute grid inset-4 overflow-hidden place-items-center border border-graphite-light">
+                <span class="px-3 py-2 border border-slate font-mono text-xs tracking-[0.14em] uppercase bg-night-light text-frost">In progress</span>
+            </div>
+        )}
+        {frames.map((frame, index) => (
+            <div class:list={[CLASS_FRAME, index === 0 && 'project-card__frame--current']}>
+                <div class="flex justify-between gap-3">
+                    <span>{frame.label}</span>
+                    <span>Capture</span>
+                </div>
+                <span class="text-balance text-silver">{project.name}</span>
+                <div class="relative h-px bg-graphite-light">
+                    <div class="absolute left-0 top-0 h-px bg-slate-light" style={`width: ${frame.width}`} />
+                </div>
+            </div>
+        ))}
+    </div>
+    <div class="flex flex-1 flex-col gap-3 p-5 pb-6">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+            <h3 class="font-bold leading-[1.2] text-balance text-xl tracking-tight wrap-anywhere">{project.name}</h3>
+            {project.domain && (
+                <span class="inline-flex gap-2 font-mono text-xs tracking-[0.08em] text-slate-light">
+                    <span class="wrap-anywhere">{project.domain}</span>
+                    <span aria-hidden="true">&nearr;</span>
+                </span>
+            )}
+        </div>
+        <p class="flex-1 leading-[1.55] text-base text-pretty wrap-anywhere text-silver">{project.description}</p>
+        <ul class="flex flex-wrap gap-2">
+            <li class="px-2 py-1 border border-graphite-light font-mono text-xs tracking-[0.14em] uppercase text-slate-light">
+                {project.completed
+                    ? <time datetime={project.completed}>{completedLabel}</time>
+                    : 'Development'}
+            </li>
+            <li class="px-2 py-1 border border-graphite-light font-mono text-xs tracking-[0.14em] uppercase wrap-anywhere text-slate-light">{project.sector}</li>
+        </ul>
+        {project.domain && <span class="sr-only">(opens in new tab)</span>}
+    </div>
+</Tag>
+
+<style>
+    .project-card__frame--current {
+        opacity: 1;
+    }
+</style>
+
+<script>
+    import { FRAMES_MIN, REDUCED_MOTION_QUERY } from '@lib/constants';
+
+    const CARD_SELECTOR = '.project-card';
+    const CURRENT_CLASS = 'project-card__frame--current';
+    const FRAME_SELECTOR = '.project-card__frame';
+    const HOVER_QUERY = '(hover: hover)';
+    const SLIDESHOW_INTERVAL = 1_000;
+    const VISIBILITY_THRESHOLD = 0.6;
+
+    const timers = new Map<HTMLElement, ReturnType<typeof setInterval>>();
+
+    let controller: AbortController | undefined;
+    let observer: IntersectionObserver | undefined;
+
+    function advanceFrames(card: HTMLElement) {
+        const frames = Array.from(card.querySelectorAll<HTMLElement>(FRAME_SELECTOR));
+
+        const currentIndex = Math.max(frames.findIndex(frame => frame.classList.contains(CURRENT_CLASS)), 0);
+
+        const nextIndex = (currentIndex + 1) % frames.length;
+
+        frames.forEach((frame, index) => {
+            frame.classList.toggle(CURRENT_CLASS, index === nextIndex);
+        });
+    }
+
+    function handleIntersect(entries: IntersectionObserverEntry[]) {
+        entries.forEach((entry) => {
+            if (!(entry.target instanceof HTMLElement)) return;
+
+            if (entry.isIntersecting) startSlideshow(entry.target);
+            else stopSlideshow(entry.target);
+        });
+    }
+
+    function initProjectCards() {
+        const cards = document.querySelectorAll<HTMLElement>(CARD_SELECTOR);
+        const isHoverable = window.matchMedia(HOVER_QUERY).matches;
+        const prefersReducedMotion = window.matchMedia(REDUCED_MOTION_QUERY).matches;
+
+        stopAllSlideshows();
+        controller = new AbortController();
+        observer = isHoverable || prefersReducedMotion ? undefined : new IntersectionObserver(handleIntersect, { threshold: VISIBILITY_THRESHOLD });
+
+        const { signal } = controller;
+
+        cards.forEach((card) => {
+            if (card.querySelectorAll(FRAME_SELECTOR).length < FRAMES_MIN) return;
+
+            card.addEventListener('focusin', () => startSlideshow(card), { signal });
+            card.addEventListener('focusout', () => stopSlideshow(card), { signal });
+
+            if (isHoverable) {
+                card.addEventListener('pointerenter', () => startSlideshow(card), { signal });
+                card.addEventListener('pointerleave', () => stopSlideshow(card), { signal });
+            }
+
+            observer?.observe(card);
+        });
+    }
+
+    function startSlideshow(card: HTMLElement) {
+        if (timers.has(card) || window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+        timers.set(card, setInterval(() => advanceFrames(card), SLIDESHOW_INTERVAL));
+    }
+
+    function stopAllSlideshows() {
+        controller?.abort();
+        observer?.disconnect();
+        timers.forEach(timer => clearInterval(timer));
+        timers.clear();
+    }
+
+    function stopSlideshow(card: HTMLElement) {
+        card.querySelectorAll<HTMLElement>(FRAME_SELECTOR).forEach((frame, index) => {
+            frame.classList.toggle(CURRENT_CLASS, index === 0);
+        });
+
+        clearInterval(timers.get(card));
+        timers.delete(card);
+    }
+
+    document.addEventListener('astro:before-swap', stopAllSlideshows);
+    document.addEventListener('astro:page-load', initProjectCards);
+</script>

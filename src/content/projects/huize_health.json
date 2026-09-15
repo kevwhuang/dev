@@ -1,0 +1,7 @@
+{
+    "description": "A bilingual site for a healthcare group, structured around ten content collections spanning institutions, regions, services, and investor news. English and Chinese throughout, with every piece of content modeled so the team updates it without a developer.",
+    "domain": "huizehealth.com",
+    "name": "Huize Health",
+    "sector": "Healthcare",
+    "tier": "enterprise"
+}
