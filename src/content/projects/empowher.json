@@ -1,0 +1,7 @@
+{
+    "description": "Nine pages present a one-day music festival in Austin to attendees and sponsors, covering three stages, a countdown to April 17, 2027, eleven organizer profiles, and three sponsorship tiers. A Stripe checkout route prices orders server side from the store collection rather than the request, though the collection is currently empty. The webhook records processed event IDs in Netlify Blobs, so a replayed event sends no second receipt.",
+    "domain": "empowheratx.com",
+    "industry": "Festival",
+    "name": "EmpowHER ATX",
+    "tier": "creative"
+}

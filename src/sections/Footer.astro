@@ -1,11 +1,14 @@
 ---
+import IconGitHub from '@components/icons/GitHub.astro';
+import IconLinkedIn from '@components/icons/LinkedIn.astro';
 import { TIMEZONE } from '@lib/constants';
 
-const CLASS_INNER = 'shell flex flex-wrap items-center justify-between gap-x-8 gap-y-4 py-7 font-mono text-xs tracking-[0.08em] text-slate-light';
+const CLASS_INNER = 'shell flex flex-wrap items-center justify-between gap-x-8 gap-y-4 pb-(--space-24) pt-(--space-24) font-mono text-sm tracking-[0.08em] text-slate-light';
+const CLASS_LINK = 'footer__link active:opacity-70 focus-visible:border-indigo focus-visible:text-indigo-bright hover:border-indigo hover:text-indigo-bright relative border-b border-slate text-silver duration-(--duration-fast) transition-[border-color,color,opacity]';
 
 const SOCIAL_LINKS = [
-    { href: 'https://github.com/kevwhuang', label: 'GitHub' },
-    { href: 'https://www.linkedin.com/in/kevwhuang', label: 'LinkedIn' },
+    { href: 'https://github.com/kevwhuang', icon: IconGitHub, label: 'GitHub' },
+    { href: 'https://www.linkedin.com/in/kevwhuang', icon: IconLinkedIn, label: 'LinkedIn' },
 ] as const;
 
 const year = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, year: 'numeric' }).format(new Date());
@@ -16,27 +19,41 @@ const year = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, year: 'numer
         <p class="whitespace-nowrap">
             &copy; <time datetime={year}>{year}</time>{' '}
             <a
-                class="footer__link active:opacity-70 focus-visible:border-vermilion focus-visible:text-vermilion hover:border-vermilion hover:text-vermilion border-b border-slate text-silver duration-(--duration-fast) transition-[border-color,color,opacity]"
+                class={CLASS_LINK}
                 aria-label="Aephonics (opens in new tab)"
                 href="https://aephonics.com"
                 target="_blank"
             >
-                Aephonics<span aria-hidden="true"> &nearr;</span>
+                Aephonics
             </a>
         </p>
-        <ul class="flex gap-6 tracking-[0.14em] uppercase">
-            {SOCIAL_LINKS.map(link => (
-                <li>
+        <ul class="flex items-center gap-6">
+            {SOCIAL_LINKS.map(({ href, icon: Icon, label }) => (
+                <li class="flex">
                     <a
-                        class="footer__social active:opacity-70 focus-visible:text-vermilion hover:text-vermilion text-silver duration-(--duration-fast) transition-[color,opacity]"
-                        aria-label={`${link.label} (opens in new tab)`}
-                        href={link.href}
+                        class="footer__social active:opacity-70 focus-visible:-translate-y-0.5 focus-visible:opacity-80 hover:-translate-y-0.5 hover:opacity-80 inline-flex relative duration-(--duration-fast) transition-[opacity,transform]"
+                        aria-label={`${label} (opens in new tab)`}
+                        href={href}
                         target="_blank"
                     >
-                        {link.label}
+                        <Icon />
                     </a>
                 </li>
             ))}
         </ul>
     </div>
 </footer>
+
+<style>
+    .footer__link::after {
+        content: '';
+        inset: -16px 0;
+        position: absolute;
+    }
+
+    .footer__social::after {
+        content: '';
+        inset: -8px;
+        position: absolute;
+    }
+</style>

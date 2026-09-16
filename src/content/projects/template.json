@@ -1,8 +1,8 @@
 {
     "completed": "2026-06",
-    "description": "The scaffold every project on this page descends from. Build tooling, type checking, testing, CI, and security headers, configured once and proven across thirteen sites.",
-    "frames": 4,
+    "description": "Every other site here begins from this starter repository. An index page, two error pages, a catch-all API route, six response security headers, and six tests across unit, integration, and end-to-end suites come preconfigured, along with lint, type checks, GitHub Actions CI, and unused Supabase scaffolding. Error middleware rewrites server errors to a dedicated 500 page, and the layout emits JSON-LD built from a shared route list.",
+    "domain": "aephonics-template.netlify.app",
+    "industry": "Software",
     "name": "Template",
-    "sector": "Infrastructure",
     "tier": "dev"
 }

@@ -1,9 +1,8 @@
 {
     "completed": "2026-06",
-    "description": "The hub linking everything I build, this site included.",
+    "description": "A landing page for Kevin Huang's personal sites, linking four subdomains. One route carries a full-screen hero and a four-card directory, where each card opens the algorithm archive, portfolio, music catalog, or travel map under its own accent color. Two stacked canvases draw the hero backdrop, one tracing a grid line by line and the other animating pulses that trail along it.",
     "domain": "aephonics.com",
-    "frames": 4,
+    "industry": "Software",
     "name": "Aephonics",
-    "sector": "Personal",
     "tier": "dev"
 }

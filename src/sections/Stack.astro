@@ -1,55 +1,66 @@
 ---
-const CLASS_TOOL = 'stack__tool active:opacity-70 focus-visible:text-vermilion hover:text-vermilion flex flex-col items-center w-24 gap-2 text-slate-light duration-(--duration-fast) transition-[color,opacity]';
+import IconAstro from '@components/icons/Astro.astro';
+import IconBun from '@components/icons/Bun.astro';
+import IconClaude from '@components/icons/Claude.astro';
+import IconEslint from '@components/icons/Eslint.astro';
+import IconGitHub from '@components/icons/GitHub.astro';
+import IconGsap from '@components/icons/Gsap.astro';
+import IconNetlify from '@components/icons/Netlify.astro';
+import IconPlaywright from '@components/icons/Playwright.astro';
+import IconReact from '@components/icons/React.astro';
+import IconResend from '@components/icons/Resend.astro';
+import IconSupabase from '@components/icons/Supabase.astro';
+import IconTailwind from '@components/icons/Tailwind.astro';
+import IconTypeScript from '@components/icons/TypeScript.astro';
+import IconVitest from '@components/icons/Vitest.astro';
+import IconVsCode from '@components/icons/VsCode.astro';
+
+const CLASS_TOOL = 'stack__tool active:opacity-70 focus-visible:bg-graphite focus-visible:text-indigo-bright hover:-translate-y-0.5 hover:bg-graphite hover:text-indigo-bright flex flex-col items-center gap-4 px-4 py-6 bg-night-light text-silver duration-(--duration-fast) transition-[background-color,color,opacity,transform]';
 
 const STACK = [
     {
-        label: 'Framework',
+        label: 'Foundation',
         tools: [
-            { abbreviation: 'as', name: 'Astro', url: 'https://astro.build' },
-            { abbreviation: 're', name: 'React', url: 'https://react.dev' },
-            { abbreviation: 'tw', name: 'Tailwind', url: 'https://tailwindcss.com' },
+            { icon: IconBun, name: 'Bun', url: 'https://bun.sh' },
+            { icon: IconTypeScript, name: 'TypeScript', url: 'https://www.typescriptlang.org' },
         ],
     },
     {
-        label: 'Language & runtime',
+        label: 'Frameworks',
         tools: [
-            { abbreviation: 'ts', name: 'TypeScript', url: 'https://www.typescriptlang.org' },
-            { abbreviation: 'bn', name: 'Bun', url: 'https://bun.sh' },
+            { icon: IconAstro, name: 'Astro', url: 'https://astro.build' },
+            { icon: IconReact, name: 'React', url: 'https://react.dev' },
+            { icon: IconTailwind, name: 'Tailwind', url: 'https://tailwindcss.com' },
         ],
     },
     {
-        label: 'Services',
+        label: 'Libraries',
         tools: [
-            { abbreviation: 'sb', name: 'Supabase', url: 'https://supabase.com' },
-            { abbreviation: 'rs', name: 'Resend', url: 'https://resend.com' },
-            { abbreviation: 'nf', name: 'Netlify', url: 'https://www.netlify.com' },
+            { icon: IconGsap, name: 'GSAP', url: 'https://gsap.com' },
+            { icon: IconResend, name: 'Resend', url: 'https://resend.com' },
         ],
     },
     {
-        label: 'Motion',
+        label: 'Platforms',
         tools: [
-            { abbreviation: 'gs', name: 'GSAP', url: 'https://gsap.com' },
-        ],
-    },
-    {
-        label: 'Tooling',
-        tools: [
-            { abbreviation: 'cc', name: 'Claude Code', url: 'https://claude.com/claude-code' },
-            { abbreviation: 'es', name: 'ESLint', url: 'https://eslint.org' },
-            { abbreviation: 'vs', name: 'VS Code', url: 'https://code.visualstudio.com' },
+            { icon: IconGitHub, name: 'GitHub', url: 'https://github.com' },
+            { icon: IconNetlify, name: 'Netlify', url: 'https://www.netlify.com' },
+            { icon: IconSupabase, name: 'Supabase', url: 'https://supabase.com' },
         ],
     },
     {
         label: 'Testing',
         tools: [
-            { abbreviation: 'vt', name: 'Vitest', url: 'https://vitest.dev' },
-            { abbreviation: 'pw', name: 'Playwright', url: 'https://playwright.dev' },
+            { icon: IconPlaywright, name: 'Playwright', url: 'https://playwright.dev' },
+            { icon: IconVitest, name: 'Vitest', url: 'https://vitest.dev' },
         ],
     },
     {
-        label: 'Source control',
+        label: 'Tooling',
         tools: [
-            { abbreviation: 'gh', name: 'GitHub', url: 'https://github.com' },
+            { icon: IconClaude, name: 'Claude Code', url: 'https://claude.com/product/claude-code' },
+            { icon: IconEslint, name: 'ESLint', url: 'https://eslint.org' },
+            { icon: IconVsCode, name: 'VS Code', url: 'https://code.visualstudio.com' },
         ],
     },
 ] as const;
@@ -62,36 +73,30 @@ const STACK = [
     <div class="shell">
         <h2
             id="stack-title"
-            class="mb-(--gap-l) pt-6 border-t border-graphite-light font-bold leading-[1.1] text-heading tracking-[-0.04em]"
-            data-scroll
+            class="sr-only"
         >
             Stack
         </h2>
         <dl
-            class="border-b border-graphite-light"
+            class="grid gap-(--space-16)"
             data-scroll
             data-scroll-stagger="0.08"
         >
             {STACK.map(group => (
-                <div class="stack__group grid gap-x-6 gap-y-4 pb-6 pt-5 border-t border-graphite-light">
-                    <dt class="pt-2 font-mono text-xs tracking-[0.14em] uppercase wrap-anywhere text-slate-light">{group.label}</dt>
+                <div class="stack__group grid items-center gap-x-6 gap-y-6">
+                    <dt class="font-bold leading-[1.2] text-title tracking-[-0.04em] text-frost">{group.label}</dt>
                     <dd>
-                        <ul class="flex flex-wrap gap-3">
-                            {group.tools.map(tool => (
+                        <ul class="stack__tools grid grid-cols-[repeat(auto-fill,minmax(136px,1fr))] gap-6">
+                            {group.tools.map(({ icon: Icon, name, url }) => (
                                 <li>
                                     <a
                                         class={CLASS_TOOL}
-                                        aria-label={`${tool.name} (opens in new tab)`}
-                                        href={tool.url}
+                                        aria-label={`${name} (opens in new tab)`}
+                                        href={url}
                                         target="_blank"
                                     >
-                                        <span
-                                            class="grid place-items-center size-14 border border-current font-mono text-sm tracking-[0.14em] uppercase select-none"
-                                            aria-hidden="true"
-                                        >
-                                            {tool.abbreviation}
-                                        </span>
-                                        <span class="font-mono leading-[1.3] text-center text-xs tracking-[0.14em] uppercase wrap-anywhere">{tool.name}</span>
+                                        <Icon />
+                                        <span class="font-mono text-center text-xs tracking-[0.14em] break-words uppercase">{name}</span>
                                     </a>
                                 </li>
                             ))}
@@ -111,6 +116,10 @@ const STACK = [
     @media (max-width: 768px) {
         .stack__group {
             grid-template-columns: 1fr;
+        }
+
+        .stack__tools {
+            gap: 16px;
         }
     }
 </style>

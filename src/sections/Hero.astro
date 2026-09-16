@@ -1,44 +1,109 @@
 ---
-import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constants';
+import { CLASS_BUTTON, REDUCED_MOTION_QUERY } from '@lib/constants';
+
+interface SubtitleSegment {
+    emphasis: boolean;
+    text: string;
+}
+
+const BUTTONS = [
+    { href: '/work', label: 'View work' },
+    { href: '#contact', label: 'Get in touch' },
+] as const;
+
+const FOLDED_CLASS = 'hero--folded';
+
+const SUBTITLE_SEGMENTS: SubtitleSegment[] = [
+    { emphasis: false, text: 'I\'m Kevin Huang, a web engineer in Austin, Texas. I' },
+    { emphasis: true, text: ' design, build, and ship production websites' },
+    { emphasis: false, text: ' \u2014 Astro, React, TypeScript, and Tailwind on Netlify and Supabase \u2014 from scaffolding through deployment, testing, and launch.' },
+];
+
+const TITLE_WORDS = ['Web', 'Engineering'] as const;
+
+const subtitleSegments = SUBTITLE_SEGMENTS.map(({ emphasis, text }) => ({
+    emphasis,
+    spaced: text.startsWith(' '),
+    words: text.trim().split(' '),
+}));
+
+const titleWords = TITLE_WORDS.map((word, wordIndex) => ({
+    characters: [...word],
+    offset: TITLE_WORDS.slice(0, wordIndex).reduce((total, previous) => total + previous.length, 0),
+}));
 ---
 
 <section
-    class="hero flex flex-col justify-end min-h-[calc(100svh-var(--header-height))] pb-(--section-padding-tight)"
+    class="hero flex flex-col justify-center overflow-hidden relative isolate min-h-[calc(100svh-var(--header-height))] py-(--space-24)"
     aria-labelledby="hero-title"
 >
+    <div
+        class="hero__backdrop absolute inset-0 z-[-1]"
+        aria-hidden="true"
+    >
+        <div class="hero__grid-tilt absolute inset-0">
+            <span class="hero__grid -inset-20 absolute" />
+        </div>
+        <div class="hero__glow-orbit absolute">
+            <span class="hero__glow absolute size-[400px] rounded-full bg-indigo-10 blur-3xl" />
+        </div>
+    </div>
     <div class="shell">
         <h1
             id="hero-title"
-            class="hero__title mb-(--gap-l) font-bold leading-[0.95] text-hero tracking-[-0.04em] whitespace-nowrap"
+            class="hero__title relative mb-(--space-12) font-bold leading-[0.95] text-hero tracking-[-0.04em] whitespace-nowrap"
             aria-label="Web Engineering"
         >
-            <span class="text-vermilion">W</span>
-            <span class="hero__fold inline-block overflow-x-clip whitespace-pre"><span class="hero__fold-text inline-block">eb </span></span>
-            <span class="text-vermilion">E</span>
-            <span class="hero__fold inline-block overflow-x-clip whitespace-pre"><span class="hero__fold-text inline-block">ngineering</span></span>
+            <span class="hero__ring absolute size-[200px] rounded-full border border-indigo" aria-hidden="true" />
+            {titleWords.map(({ characters, offset }, wordIndex) => (
+                <Fragment>
+                    {wordIndex > 0 && ' '}
+                    <span class="hero__word inline-block">
+                        {characters.map((character, index) => (
+                            <span
+                                class={index === 0 ? 'hero__char hero__char--accent inline-block text-indigo' : 'hero__char inline-block'}
+                                style={`--hero-char-index: ${offset + index}`}
+                            >
+                                {character}
+                            </span>
+                        ))}
+                    </span>
+                </Fragment>
+            ))}
         </h1>
-        <div class="hero__body">
-            <p class="hero__subtitle max-w-(--measure-prose) mb-(--gap-l) leading-[1.5] text-prose text-silver">I'm Kevin Huang. I design, build, and ship production websites &mdash; scaffolding through deployment &mdash; from Austin, Texas.</p>
-            <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
-                <div class="flex flex-wrap gap-3">
-                    <a
-                        class={CLASS_BUTTON}
-                        href="/work"
-                    >
-                        View work
-                    </a>
-                    <a
-                        class={CLASS_BUTTON}
-                        href="#contact"
-                    >
-                        Get in touch
-                    </a>
-                </div>
-                <p class="flex gap-[14px] font-mono text-xs tracking-[0.14em] uppercase whitespace-nowrap text-slate-light">
-                    <span>Austin, Texas</span>
-                    <span class="hero__clock tabular-nums text-silver select-none">Central Time</span>
-                </p>
-            </div>
+        <p class="hero__subtitle max-w-(--measure-prose) mb-(--space-12) leading-[1.5] text-prose tracking-[-0.01em] text-silver">
+            {subtitleSegments.map(({ emphasis, spaced, words }) => (
+                <Fragment>
+                    {spaced && ' '}
+                    {emphasis
+                        ? (
+                                <strong class="text-frost">
+                                    {words.map((word, index) => (
+                                        <Fragment>
+                                            {index > 0 && ' '}
+                                            <span class="hero__sub-word inline-block">{word}</span>
+                                        </Fragment>
+                                    ))}
+                                </strong>
+                            )
+                        : words.map((word, index) => (
+                                <Fragment>
+                                    {index > 0 && ' '}
+                                    <span class="hero__sub-word inline-block">{word}</span>
+                                </Fragment>
+                            ))}
+                </Fragment>
+            ))}
+        </p>
+        <div class="hero__body flex flex-wrap gap-3">
+            {BUTTONS.map(({ href, label }) => (
+                <a
+                    class={CLASS_BUTTON}
+                    href={href}
+                >
+                    {label}
+                </a>
+            ))}
         </div>
     </div>
 </section>
@@ -46,43 +111,190 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
 <style>
     .hero--folded .hero__body > * {
         opacity: 0;
-        transform: translateY(14px);
+        transform: translateY(16px);
+        transition-property: background-color, border-color, color;
     }
 
-    .hero--folded .hero__fold {
-        width: 0;
-    }
-
-    .hero--folded .hero__fold-text {
+    .hero--folded .hero__char {
+        filter: blur(8px);
         opacity: 0;
-        transform: translateX(-0.6em);
+        transform: translateY(110%) rotateX(70deg);
+    }
+
+    .hero--folded .hero__char--accent {
+        transform: translateY(110%) rotateX(70deg) scale(1.25);
+    }
+
+    .hero--folded .hero__glow-orbit {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    .hero--folded .hero__grid-tilt {
+        opacity: 0;
+        transform: scale(1.15);
+    }
+
+    .hero--folded .hero__sub-word {
+        filter: blur(6px);
+        opacity: 0;
+        transform: translateY(14px) rotateX(-40deg);
+        transform-origin: 50% 100%;
+    }
+
+    .hero--live .hero__char--accent {
+        animation:
+            hero__char-float 5s ease-in-out infinite,
+            hero__accent-glow 4s ease-in-out infinite;
+        animation-delay: calc(var(--hero-char-index) * 0.35s);
+    }
+
+    .hero--live .hero__char:not(.hero__char--accent) {
+        animation:
+            hero__char-float 5s ease-in-out infinite,
+            hero__char-sweep 8s linear infinite;
+        animation-delay: calc(var(--hero-char-index) * 0.35s);
+    }
+
+    .hero__glow {
+        animation: hero__glow-orbit 14s ease-in-out infinite;
+        left: -200px;
+        top: -200px;
+    }
+
+    .hero__glow-orbit {
+        left: 18%;
+        top: 46%;
+    }
+
+    .hero__grid {
+        animation: hero__grid-drift 96s linear infinite;
+        background-image:
+            linear-gradient(var(--color-graphite-light) 1px, transparent 1px),
+            linear-gradient(90deg, var(--color-graphite-light) 1px, transparent 1px);
+        background-size: 80px 80px;
+        mask-image: radial-gradient(ellipse at center, var(--color-night) 25%, transparent 72%);
+        opacity: 0.3;
+    }
+
+    .hero__grid-tilt {
+        perspective: 900px;
+    }
+
+    .hero__ring {
+        left: 0.4em;
+        opacity: 0;
+        top: 50%;
+        translate: -50% -50%;
+    }
+
+    .hero__word {
+        perspective: 900px;
+    }
+
+    @media (max-width: 768px) {
+        .hero {
+            min-height: auto;
+        }
+    }
+
+    @keyframes hero__accent-glow {
+        from {
+            filter: drop-shadow(0 0 0 var(--color-indigo));
+        }
+
+        50% {
+            filter: drop-shadow(0 0 24px var(--color-indigo));
+        }
+
+        to {
+            filter: drop-shadow(0 0 0 var(--color-indigo));
+        }
+    }
+
+    @keyframes hero__char-float {
+        from {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-2px);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes hero__char-sweep {
+        from {
+            filter: brightness(1);
+        }
+
+        4% {
+            filter: brightness(1.5);
+        }
+
+        12% {
+            filter: brightness(1);
+        }
+
+        to {
+            filter: brightness(1);
+        }
+    }
+
+    @keyframes hero__glow-orbit {
+        from {
+            opacity: 1;
+            transform: translate(0, -20px) scale(1);
+        }
+
+        25% {
+            opacity: 0.8;
+            transform: translate(30px, 0) scale(1.06);
+        }
+
+        50% {
+            opacity: 1;
+            transform: translate(0, 20px) scale(1.1);
+        }
+
+        75% {
+            opacity: 0.8;
+            transform: translate(-30px, 0) scale(1.06);
+        }
+
+        to {
+            opacity: 1;
+            transform: translate(0, -20px) scale(1);
+        }
+    }
+
+    @keyframes hero__grid-drift {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(-80px, -80px);
+        }
     }
 </style>
 
 <script
-    define:vars={{ heroShownKey: HERO_SHOWN_KEY, reducedMotionQuery: REDUCED_MOTION_QUERY }}
+    define:vars={{ foldedClass: FOLDED_CLASS, reducedMotionQuery: REDUCED_MOTION_QUERY }}
     is:inline
 >
-    const FOLDED_CLASS = 'hero--folded';
-
     function initHeroFold() {
         if (document.readyState !== 'loading') return;
 
         const hero = document.querySelector('.hero');
 
         if (!hero) return;
+        if (window.matchMedia(reducedMotionQuery).matches) return;
 
-        let hasShownHero;
-
-        try {
-            hasShownHero = Boolean(sessionStorage.getItem(heroShownKey));
-        } catch {
-            hasShownHero = false;
-        }
-
-        if (hasShownHero || window.matchMedia(reducedMotionQuery).matches) return;
-
-        hero.classList.add(FOLDED_CLASS);
+        hero.classList.add(foldedClass);
     }
 
     initHeroFold();
@@ -90,42 +302,137 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
 
 <script>
     import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-    import { HERO_SHOWN_KEY, REDUCED_MOTION_QUERY, TIMEZONE } from '@lib/constants';
+    import { REDUCED_MOTION_QUERY } from '@lib/constants';
 
-    const BEAT_DELAY = 1_100;
+    interface Magnet {
+        element: HTMLElement;
+        x: ReturnType<typeof gsap.quickTo>;
+        y: ReturnType<typeof gsap.quickTo>;
+    }
+
+    const ACCENT_DURATION = 0.9;
+    const ACCENT_EASE = 'back.out(2)';
+    const ACCENT_POSITION = '>-0.85';
+    const ACCENT_SCALE = 1.25;
+    const ACCENT_SELECTOR = '.hero__char--accent';
+    const ACCENT_STAGGER = 0.1;
+    const BEAT_DELAY = 200;
     const BODY_CHILDREN_SELECTOR = '.hero__body > *';
-    const BODY_DELAY = 0.65;
-    const BODY_DURATION = 0.7;
-    const BODY_EASE = 'power2.out';
-    const BODY_STAGGER = 0.2;
-    const CLOCK_INTERVAL = 1_000;
-    const CLOCK_SELECTOR = '.hero__clock';
+    const BODY_DURATION = 0.9;
+    const BODY_EASE = 'power3.out';
+    const BODY_LABEL = 'buttons';
+    const BODY_POSITION = '>-0.25';
+    const BODY_SHIFT = 16;
+    const BODY_STAGGER = 0.1;
+    const CHAR_BLUR = 'blur(8px)';
+    const CHAR_DURATION = 0.8;
+    const CHAR_EASE = 'expo.out';
+    const CHAR_LABEL = 'letters';
+    const CHAR_POSITION = '>-0.6';
+    const CHAR_ROTATION = 70;
+    const CHAR_SELECTOR = '.hero__char';
+    const CHAR_SHIFT = 110;
+    const CHAR_STAGGER = 0.035;
+    const CLEARED_PROPS = 'filter,opacity,transform';
     const FOLDED_CLASS = 'hero--folded';
-    const FOLD_DURATION = 1.1;
-    const FOLD_EASE = 'power3.inOut';
-    const FOLD_SELECTOR = '.hero__fold';
-    const FOLD_TEXT_DELAY = 0.2;
-    const FOLD_TEXT_DURATION = 0.7;
-    const FOLD_TEXT_SELECTOR = '.hero__fold-text';
+    const GLOW_DURATION = 1.2;
+    const GLOW_EASE = 'expo.out';
+    const GLOW_POSITION = '<0.1';
+    const GRID_DURATION = 1.2;
+    const GRID_EASE = 'power2.out';
+    const GRID_POSITION = 0;
+    const GRID_SELECTOR = '.hero__grid-tilt';
     const HERO_SELECTOR = '.hero';
+    const LIVE_CLASS = 'hero--live';
+    const MAGNET_DURATION = 0.4;
+    const MAGNET_EASE = 'power3.out';
+    const MAGNET_OFFSET = 6;
+    const MAGNET_RANGE = 80;
+    const MAGNET_SELECTOR = '.hero__body a';
+    const ORBIT_SELECTOR = '.hero__glow-orbit';
+    const PARALLAX_DURATION = 0.9;
+    const PARALLAX_EASE = 'power3.out';
+    const PARALLAX_RANGE = 40;
+    const PERSPECTIVE = 900;
+    const PULSE_DURATION = 0.3;
+    const PULSE_EASE = 'power2.inOut';
+    const PULSE_SCALE = 1.2;
+    const REST_BLUR = 'blur(0px)';
+    const RING_DURATION = 1.2;
+    const RING_EASE = 'power2.out';
+    const RING_OPACITY = 0.6;
+    const RING_POSITION = '>-0.7';
+    const RING_SCALE_FROM = 0.2;
+    const RING_SCALE_TO = 2.4;
+    const RING_SELECTOR = '.hero__ring';
+    const SCROLL_EASE = 'none';
+    const SCROLL_END = 'bottom top';
+    const SCROLL_SHIFT = -60;
+    const SCROLL_START = 'top top';
+    const SUBTITLE_BLUR = 'blur(6px)';
+    const SUBTITLE_DURATION = 0.6;
+    const SUBTITLE_EASE = 'power3.out';
+    const SUBTITLE_ORIGIN = '50% 100%';
+    const SUBTITLE_POSITION = '>-0.3';
+    const SUBTITLE_ROTATION = -40;
+    const SUBTITLE_SELECTOR = '.hero__sub-word';
+    const SUBTITLE_SHIFT = 14;
+    const SUBTITLE_STAGGER = 0.018;
+    const SYNC_POSITION = '<';
+    const TILT_ANGLE = 0.75;
+    const TILT_DURATION = 0.6;
+    const TILT_EASE = 'power3.out';
+    const TITLE_SELECTOR = '.hero__title';
+    const TRAIL_SELECTOR = '.hero__char:not(.hero__char--accent)';
+    const WORD_SELECTOR = '.hero__word';
+
+    const magnets: Magnet[] = [];
 
     let beatTimer: ReturnType<typeof setTimeout>;
-    let clock: HTMLElement | null;
-    let clockTimer: ReturnType<typeof setInterval>;
-    let timeline: gsap.core.Timeline;
+    let parallaxX: ReturnType<typeof gsap.quickTo> | undefined;
+    let parallaxY: ReturnType<typeof gsap.quickTo> | undefined;
+    let scrollTimeline: gsap.core.Timeline | undefined;
+    let tiltX: ReturnType<typeof gsap.quickTo> | undefined;
+    let tiltY: ReturnType<typeof gsap.quickTo> | undefined;
+    let timeline: gsap.core.Timeline | undefined;
 
-    function completeHero(hero: HTMLElement, targets: HTMLElement[]) {
-        gsap.set(targets, { clearProps: 'all' });
+    function activateHero(hero: HTMLElement) {
+        hero.classList.add(LIVE_CLASS);
+
+        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+        initMagnets(hero);
+        initScrollParallax(hero);
+        initTilt(hero);
+    }
+
+    function collectTargets(hero: HTMLElement) {
+        const selectors = [
+            BODY_CHILDREN_SELECTOR,
+            CHAR_SELECTOR,
+            GRID_SELECTOR,
+            ORBIT_SELECTOR,
+            RING_SELECTOR,
+            SUBTITLE_SELECTOR,
+        ];
+
+        return [...hero.querySelectorAll<HTMLElement>(selectors.join(', '))];
+    }
+
+    function completeHero(hero: HTMLElement) {
         hero.classList.remove(FOLDED_CLASS);
+        activateHero(hero);
     }
 
     function foldHero() {
         const hero = document.querySelector<HTMLElement>(HERO_SELECTOR);
 
         if (!hero) return;
-        if (hasShownHero() || window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
 
+        hero.classList.remove(LIVE_CLASS);
         hero.classList.add(FOLDED_CLASS);
     }
 
@@ -139,17 +446,51 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
         if (!hero || !hero.classList.contains(FOLDED_CLASS)) return;
 
         clearTimeout(beatTimer);
-        markHeroShown();
         timeline?.kill();
-        completeHero(hero, [...hero.querySelectorAll<HTMLElement>(`${BODY_CHILDREN_SELECTOR}, ${FOLD_SELECTOR}, ${FOLD_TEXT_SELECTOR}`)]);
+        gsap.set(collectTargets(hero), { clearProps: CLEARED_PROPS });
+        completeHero(hero);
     }
 
-    function hasShownHero() {
-        try {
-            return Boolean(sessionStorage.getItem(HERO_SHOWN_KEY));
-        } catch {
-            return false;
-        }
+    function handlePointerMove(event: PointerEvent) {
+        const hero = document.querySelector<HTMLElement>(HERO_SELECTOR);
+
+        if (!hero) return;
+        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+        const bounds = hero.getBoundingClientRect();
+
+        if (!bounds.width || !bounds.height) return;
+
+        const ratioX = gsap.utils.clamp(-1, 1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2);
+        const ratioY = gsap.utils.clamp(-1, 1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2);
+
+        parallaxX?.(ratioX * PARALLAX_RANGE);
+        parallaxY?.(ratioY * PARALLAX_RANGE);
+        tiltX?.(-ratioY * TILT_ANGLE);
+        tiltY?.(ratioX * TILT_ANGLE);
+
+        magnets.forEach(({ element, x, y }) => {
+            const rect = element.getBoundingClientRect();
+
+            const gapX = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right);
+            const gapY = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom);
+
+            const distance = Math.hypot(gapX, gapY);
+
+            if (distance > MAGNET_RANGE) {
+                x(0);
+                y(0);
+
+                return;
+            }
+
+            const pull = 1 - distance / MAGNET_RANGE;
+            const towardX = (event.clientX - (rect.left + rect.right) / 2) / (rect.width / 2 + MAGNET_RANGE);
+            const towardY = (event.clientY - (rect.top + rect.bottom) / 2) / (rect.height / 2 + MAGNET_RANGE);
+
+            x(gsap.utils.clamp(-1, 1, towardX) * MAGNET_OFFSET * pull);
+            y(gsap.utils.clamp(-1, 1, towardY) * MAGNET_OFFSET * pull);
+        });
     }
 
     function initHero() {
@@ -159,14 +500,19 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
 
         if (!hero) return;
 
-        clock = hero.querySelector<HTMLElement>(CLOCK_SELECTOR);
-        clockTimer = setInterval(updateClock, CLOCK_INTERVAL);
-        updateClock();
+        const isReduced = window.matchMedia(REDUCED_MOTION_QUERY).matches;
 
-        if (!hero.classList.contains(FOLDED_CLASS)) return;
+        if (!isReduced) initParallax(hero);
 
-        if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+        if (!hero.classList.contains(FOLDED_CLASS)) {
+            activateHero(hero);
+
+            return;
+        }
+
+        if (isReduced) {
             hero.classList.remove(FOLDED_CLASS);
+            activateHero(hero);
 
             return;
         }
@@ -174,20 +520,74 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
         resolveHero(hero);
     }
 
-    function markHeroShown() {
-        try {
-            sessionStorage.setItem(HERO_SHOWN_KEY, '1');
-        } catch {
-            return;
-        }
+    function initMagnets(hero: HTMLElement) {
+        magnets.length = 0;
+
+        hero.querySelectorAll<HTMLElement>(MAGNET_SELECTOR).forEach((element) => {
+            magnets.push({
+                element,
+                x: gsap.quickTo(element, 'x', { duration: MAGNET_DURATION, ease: MAGNET_EASE }),
+                y: gsap.quickTo(element, 'y', { duration: MAGNET_DURATION, ease: MAGNET_EASE }),
+            });
+        });
+    }
+
+    function initParallax(hero: HTMLElement) {
+        const orbit = hero.querySelector<HTMLElement>(ORBIT_SELECTOR);
+
+        if (!orbit) return;
+
+        parallaxX = gsap.quickTo(orbit, 'x', { duration: PARALLAX_DURATION, ease: PARALLAX_EASE });
+        parallaxY = gsap.quickTo(orbit, 'y', { duration: PARALLAX_DURATION, ease: PARALLAX_EASE });
+    }
+
+    function initScrollParallax(hero: HTMLElement) {
+        const orbit = hero.querySelector<HTMLElement>(ORBIT_SELECTOR);
+        const title = hero.querySelector<HTMLElement>(TITLE_SELECTOR);
+
+        if (!orbit || !title) return;
+
+        const scrubbed = gsap.timeline({
+            scrollTrigger: {
+                end: SCROLL_END,
+                scrub: true,
+                start: SCROLL_START,
+                trigger: hero,
+            },
+        });
+
+        scrubbed
+            .to(title, { ease: SCROLL_EASE, y: SCROLL_SHIFT }, 0)
+            .to(orbit, { ease: SCROLL_EASE, opacity: 0 }, 0);
+
+        scrollTimeline = scrubbed;
+    }
+
+    function initTilt(hero: HTMLElement) {
+        const tilt = hero.querySelector<HTMLElement>(GRID_SELECTOR);
+
+        if (!tilt) return;
+
+        const vars = { duration: TILT_DURATION, ease: TILT_EASE, transformPerspective: PERSPECTIVE };
+
+        tiltX = gsap.quickTo(tilt, 'rotationX', vars);
+        tiltY = gsap.quickTo(tilt, 'rotationY', vars);
     }
 
     async function resolveHero(hero: HTMLElement) {
-        const bodyChildren = hero.querySelectorAll<HTMLElement>(BODY_CHILDREN_SELECTOR);
-        const foldTexts = hero.querySelectorAll<HTMLElement>(FOLD_TEXT_SELECTOR);
-        const folds = hero.querySelectorAll<HTMLElement>(FOLD_SELECTOR);
+        const accents = [...hero.querySelectorAll<HTMLElement>(ACCENT_SELECTOR)];
+        const buttons = [...hero.querySelectorAll<HTMLElement>(BODY_CHILDREN_SELECTOR)];
+        const grid = hero.querySelector<HTMLElement>(GRID_SELECTOR);
+        const orbit = hero.querySelector<HTMLElement>(ORBIT_SELECTOR);
+        const ring = hero.querySelector<HTMLElement>(RING_SELECTOR);
+        const subWords = [...hero.querySelectorAll<HTMLElement>(SUBTITLE_SELECTOR)];
+        const words = [...hero.querySelectorAll<HTMLElement>(WORD_SELECTOR)];
 
-        const targets = [...bodyChildren, ...folds, ...foldTexts];
+        if (!grid || !orbit || !ring) {
+            completeHero(hero);
+
+            return;
+        }
 
         await document.fonts.ready;
 
@@ -195,42 +595,122 @@ import { CLASS_BUTTON, HERO_SHOWN_KEY, REDUCED_MOTION_QUERY } from '@lib/constan
             beatTimer = setTimeout(resolve, BEAT_DELAY);
         });
 
-        markHeroShown();
+        const intro = gsap.timeline({ onComplete: () => completeHero(hero) });
 
-        const widths = Array.from(folds, fold => fold.scrollWidth);
+        intro
+            .to(grid, { duration: GRID_DURATION, ease: GRID_EASE, opacity: 1, scale: 1 }, GRID_POSITION)
+            .to(orbit, { duration: GLOW_DURATION, ease: GLOW_EASE, opacity: 1, scale: 1 }, GLOW_POSITION)
+            .fromTo(accents, {
+                filter: CHAR_BLUR,
+                opacity: 0,
+                rotationX: CHAR_ROTATION,
+                y: 0,
+                yPercent: CHAR_SHIFT,
+            }, {
+                duration: ACCENT_DURATION,
+                ease: CHAR_EASE,
+                filter: REST_BLUR,
+                immediateRender: false,
+                opacity: 1,
+                rotationX: 0,
+                stagger: ACCENT_STAGGER,
+                yPercent: 0,
+            }, ACCENT_POSITION)
+            .fromTo(accents, { scale: ACCENT_SCALE }, {
+                duration: ACCENT_DURATION,
+                ease: ACCENT_EASE,
+                immediateRender: false,
+                scale: 1,
+                stagger: ACCENT_STAGGER,
+            }, SYNC_POSITION)
+            .fromTo(ring, { opacity: RING_OPACITY, scale: RING_SCALE_FROM }, {
+                duration: RING_DURATION,
+                ease: RING_EASE,
+                immediateRender: false,
+                opacity: 0,
+                scale: RING_SCALE_TO,
+            }, RING_POSITION)
+            .fromTo(orbit, { scale: 1 }, {
+                duration: PULSE_DURATION,
+                ease: PULSE_EASE,
+                immediateRender: false,
+                repeat: 1,
+                scale: PULSE_SCALE,
+                yoyo: true,
+            }, SYNC_POSITION)
+            .addLabel(CHAR_LABEL, CHAR_POSITION);
 
-        timeline = gsap.timeline({ onComplete: () => completeHero(hero, targets) });
+        words.forEach((word) => {
+            const trailing = [...word.querySelectorAll<HTMLElement>(TRAIL_SELECTOR)];
 
-        timeline
-            .to(folds, { duration: FOLD_DURATION, ease: FOLD_EASE, width: (index: number) => widths[index] }, 0)
-            .to(foldTexts, { duration: FOLD_DURATION, ease: FOLD_EASE, x: 0 }, 0)
-            .to(foldTexts, { duration: FOLD_TEXT_DURATION, opacity: 1 }, FOLD_TEXT_DELAY)
-            .to(bodyChildren, { duration: BODY_DURATION, ease: BODY_EASE, opacity: 1, stagger: BODY_STAGGER, y: 0 }, BODY_DELAY);
+            if (!trailing.length) return;
+
+            intro.fromTo(trailing, {
+                filter: CHAR_BLUR,
+                opacity: 0,
+                rotationX: CHAR_ROTATION,
+                y: 0,
+                yPercent: CHAR_SHIFT,
+            }, {
+                duration: CHAR_DURATION,
+                ease: CHAR_EASE,
+                filter: REST_BLUR,
+                immediateRender: false,
+                opacity: 1,
+                rotationX: 0,
+                stagger: { each: CHAR_STAGGER, from: 0 },
+                yPercent: 0,
+            }, CHAR_LABEL);
+        });
+
+        intro
+            .fromTo(subWords, {
+                filter: SUBTITLE_BLUR,
+                opacity: 0,
+                rotationX: SUBTITLE_ROTATION,
+                y: SUBTITLE_SHIFT,
+            }, {
+                duration: SUBTITLE_DURATION,
+                ease: SUBTITLE_EASE,
+                filter: REST_BLUR,
+                immediateRender: false,
+                opacity: 1,
+                rotationX: 0,
+                stagger: SUBTITLE_STAGGER,
+                transformOrigin: SUBTITLE_ORIGIN,
+                y: 0,
+            }, SUBTITLE_POSITION)
+            .addLabel(BODY_LABEL, BODY_POSITION)
+            .fromTo(buttons, { opacity: 0, y: BODY_SHIFT }, {
+                duration: BODY_DURATION,
+                ease: BODY_EASE,
+                immediateRender: false,
+                opacity: 1,
+                stagger: BODY_STAGGER,
+                y: 0,
+            }, BODY_LABEL);
+
+        timeline = intro;
     }
 
     function teardownHero() {
-        clock = null;
-        clearInterval(clockTimer);
         clearTimeout(beatTimer);
+        magnets.length = 0;
+        parallaxX = undefined;
+        parallaxY = undefined;
+        scrollTimeline?.scrollTrigger?.kill();
+        scrollTimeline?.kill();
+        scrollTimeline = undefined;
+        tiltX = undefined;
+        tiltY = undefined;
         timeline?.kill();
-    }
-
-    function updateClock() {
-        if (!clock) return;
-
-        const time = new Date().toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            hour12: false,
-            minute: '2-digit',
-            second: '2-digit',
-            timeZone: TIMEZONE,
-        });
-
-        clock.textContent = `${time} CT`;
+        timeline = undefined;
     }
 
     document.addEventListener('astro:after-swap', foldHero);
     document.addEventListener('astro:before-swap', teardownHero);
     document.addEventListener('astro:page-load', initHero);
     document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('pointermove', handlePointerMove);
+    gsap.registerPlugin(ScrollTrigger);
 </script>

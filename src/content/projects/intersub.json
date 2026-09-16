@@ -1,9 +1,8 @@
 {
     "completed": "2026-07",
-    "description": "An English-language coaching practice serving professionals in China. Fully bilingual across English and Chinese, with an admin dashboard where the team publishes events, outcomes, and testimonials themselves.",
+    "description": "Five API routes and four pages cover events, outcomes, and testimonials for a business English coaching practice serving Chinese professionals. An English and Chinese toggle swaps 153 translated strings at runtime and reformats dates into the Chinese year, month, day order. Staff sign in through Netlify Identity to manage entries from an admin dashboard, which writes to Netlify Blobs in production and to local JSON files in development.",
     "domain": "intersubstudio.com",
-    "frames": 5,
+    "industry": "Education",
     "name": "InterSub",
-    "sector": "Education",
     "tier": "entrepreneur"
 }

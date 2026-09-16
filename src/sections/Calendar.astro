@@ -5,15 +5,17 @@ import { TIMEZONE } from '@lib/constants';
 
 interface Cell {
     day: number;
+    ghost: boolean;
     key: string;
     label: string;
     place: string;
-    state: '' | keyof typeof STATE_CLASSES;
+    state: keyof typeof STATE_CLASSES;
 }
 
-const BLANK_CELL = { day: 0, key: '', label: '', place: '', state: '' } as const;
-const CALENDAR_YEAR = 2_026;
-const CLASS_MONTH_BUTTON = 'calendar__button disabled:opacity-40 enabled:active:bg-vermilion-10 enabled:hover:border-vermilion enabled:hover:text-vermilion focus-visible:border-vermilion focus-visible:text-vermilion grid place-items-center size-12 border border-slate font-mono text-base text-frost duration-(--duration-fast) transition-[background-color,border-color,color,opacity] select-none';
+const CALENDAR_YEARS = [2_026, 2_027] as const;
+const CLASS_MONTH_BUTTON = 'calendar__button disabled:opacity-40 enabled:active:bg-indigo-10 enabled:hover:border-indigo enabled:hover:text-indigo-bright focus-visible:border-indigo focus-visible:text-indigo-bright grid place-items-center size-12 border border-slate font-mono text-base text-frost duration-(--duration-fast) transition-[background-color,border-color,color,opacity] select-none';
+const CLASS_PLACE = 'calendar__place absolute bottom-3 left-3 z-1 max-w-[calc(100%-24px)] font-mono text-xs tracking-[0.14em] truncate uppercase text-indigo-bright';
+const CLASS_TRAVELING = 'bg-indigo-10';
 const DATE_PAD = 2;
 const DAYS_PER_WEEK = 7;
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as const;
@@ -23,7 +25,7 @@ const STATE_CLASSES = {
     booked: 'text-slate-light',
     open: 'text-frost',
     past: 'text-slate-light',
-    traveling: 'bg-graphite text-frost',
+    traveling: `${CLASS_TRAVELING} text-frost`,
     weekend: 'text-slate-light',
 } as const;
 
@@ -38,46 +40,84 @@ const bookedRanges = ranges.filter(range => range.data.kind === 'booked');
 const [todayYear, todayMonth] = today.split('-');
 const travelRanges = ranges.filter(range => range.data.kind === 'travel');
 
-const initialMonth = Number(todayYear) === CALENDAR_YEAR ? Number(todayMonth) - 1 : 0;
-const months = MONTHS.map((_, index) => getCells(index));
+const months = CALENDAR_YEARS.flatMap(year => MONTHS.map((name, index) => ({
+    cells: getCells(year, index),
+    id: `${year}-${String(index + 1).padStart(DATE_PAD, '0')}`,
+    label: `${name} ${year}`,
+})));
 
-function getCells(month: number) {
+const initialMonth = Math.max(0, months.findIndex(month => month.id === `${todayYear}-${todayMonth}`));
+
+function getCells(year: number, month: number) {
     const cells: Cell[] = [];
-    const dayCount = new Date(Date.UTC(CALENDAR_YEAR, month + 1, 0)).getUTCDate();
-    const firstWeekday = new Date(Date.UTC(CALENDAR_YEAR, month, 1)).getUTCDay();
+    const dayCount = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const firstWeekday = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    const labeled = new Set<string>();
 
-    for (let index = 0; index < firstWeekday; index++) {
-        cells.push(BLANK_CELL);
+    for (let offset = firstWeekday; offset > 0; offset--) {
+        cells.push(getGhostCell(year, month, 1 - offset, labeled));
     }
 
     for (let day = 1; day <= dayCount; day++) {
-        const key = `${CALENDAR_YEAR}-${String(month + 1).padStart(DATE_PAD, '0')}-${String(day).padStart(DATE_PAD, '0')}`;
-        const weekday = new Date(Date.UTC(CALENDAR_YEAR, month, day)).getUTCDay();
+        const date = new Date(Date.UTC(year, month, day));
 
-        const travelRange = travelRanges.find(range => key >= range.data.start && key <= range.data.end);
+        const key = getKey(date);
+        const weekday = date.getUTCDay();
 
-        const place = travelRange && (day === 1 || key === travelRange.data.start || weekday === SUNDAY) ? travelRange.data.place ?? '' : '';
-        const state = getDayState(key, weekday, Boolean(travelRange));
+        const range = getTravelRange(key);
+
+        const place = getPlace(range, labeled);
+        const state = getDayState(key, weekday, Boolean(range));
 
         const label = state === 'booked' || state === 'open' || state === 'traveling' ? state : '';
 
-        cells.push({ day, key, label, place, state });
+        cells.push({ day, ghost: false, key, label, place, state });
     }
 
-    while (cells.length % DAYS_PER_WEEK !== 0) {
-        cells.push(BLANK_CELL);
+    for (let day = dayCount + 1; cells.length % DAYS_PER_WEEK !== 0; day++) {
+        cells.push(getGhostCell(year, month, day, labeled));
     }
 
     return cells;
 }
 
 function getDayState(key: string, weekday: number, isTraveling: boolean) {
-    if (key < today) return 'past';
     if (isTraveling) return 'traveling';
+    if (key < today) return 'past';
     if (weekday === SATURDAY || weekday === SUNDAY) return 'weekend';
     if (bookedRanges.some(range => key >= range.data.start && key <= range.data.end)) return 'booked';
 
     return 'open';
+}
+
+function getGhostCell(year: number, month: number, day: number, labeled: Set<string>): Cell {
+    const date = new Date(Date.UTC(year, month, day));
+
+    const key = getKey(date);
+    const weekday = date.getUTCDay();
+
+    const range = getTravelRange(key);
+
+    const place = getPlace(range, labeled);
+    const state = getDayState(key, weekday, Boolean(range));
+
+    return { day: date.getUTCDate(), ghost: true, key, label: '', place, state };
+}
+
+function getKey(date: Date) {
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(DATE_PAD, '0')}-${String(date.getUTCDate()).padStart(DATE_PAD, '0')}`;
+}
+
+function getPlace(range: ReturnType<typeof getTravelRange>, labeled: Set<string>) {
+    if (!range || labeled.has(range.id)) return '';
+
+    labeled.add(range.id);
+
+    return range.data.place ?? '';
+}
+
+function getTravelRange(key: string) {
+    return travelRanges.find(range => key >= range.data.start && key <= range.data.end);
 }
 ---
 
@@ -87,7 +127,7 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
 >
     <div class="shell">
         <div
-            class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 mb-(--gap-l) pt-6 border-t border-graphite-light"
+            class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 mb-(--space-12) pt-6 border-graphite-light border-t"
             data-scroll
         >
             <h2
@@ -96,7 +136,7 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
                 aria-live="polite"
             >
                 <span class="sr-only">Calendar: </span>
-                <span class="calendar__month">{MONTHS[initialMonth]}</span> {CALENDAR_YEAR}
+                <span class="calendar__label">{months[initialMonth].label}</span>
             </h2>
             <div class="flex gap-2">
                 <button
@@ -112,7 +152,7 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
                     class={CLASS_MONTH_BUTTON}
                     aria-label="Next month"
                     data-calendar-next
-                    disabled={initialMonth === MONTHS.length - 1}
+                    disabled={initialMonth === months.length - 1}
                     type="button"
                 >
                     &rarr;
@@ -124,34 +164,33 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
             data-scroll
         >
             <ul
-                class="grid grid-cols-7 pb-[10px] font-mono text-xs tracking-[0.14em] uppercase text-slate-light"
+                class="grid grid-cols-7 pb-3 font-mono text-xs tracking-[0.14em] uppercase text-slate-light"
                 aria-hidden="true"
             >
-                {WEEKDAYS.map(weekday => <li class="pl-[10px]">{weekday}</li>)}
+                {WEEKDAYS.map(weekday => <li class="pl-3">{weekday}</li>)}
             </ul>
-            {months.map((cells, index) => (
+            {months.map((month, index) => (
                 <ul
-                    class="calendar__grid grid grid-cols-7 border-l border-t border-graphite-light"
+                    class="calendar__grid grid grid-cols-7 overflow-hidden isolate border-graphite-light border-l border-t"
+                    data-label={month.label}
                     hidden={index !== initialMonth}
                 >
-                    {cells.map(cell => (
+                    {month.cells.map(cell => (
                         <li
                             class:list={[
-                                'calendar__day relative p-[10px] border-b border-r border-graphite-light',
-                                cell.state && STATE_CLASSES[cell.state],
+                                'calendar__day relative p-3 border-b border-graphite-light border-r',
+                                cell.ghost ? ['calendar__day--ghost', cell.state === 'traveling' && CLASS_TRAVELING, 'text-slate'] : STATE_CLASSES[cell.state],
                             ]}
-                            aria-hidden={cell.day === 0 ? 'true' : undefined}
+                            aria-hidden={cell.ghost ? 'true' : undefined}
                         >
-                            {cell.day !== 0 && (
-                                <time
-                                    class="font-mono text-sm"
-                                    datetime={cell.key}
-                                >
-                                    {cell.day}
-                                </time>
-                            )}
+                            <time
+                                class="font-mono text-base"
+                                datetime={cell.key}
+                            >
+                                {cell.day}
+                            </time>
                             {cell.label && <span class="sr-only">{cell.label}</span>}
-                            {cell.place && <span class="absolute bottom-[10px] inset-x-[10px] font-mono text-xs tracking-[0.14em] truncate uppercase text-frost">{cell.place}</span>}
+                            {cell.place && <span class={CLASS_PLACE}>{cell.place}</span>}
                         </li>
                     ))}
                 </ul>
@@ -162,26 +201,24 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
 
 <style>
     .calendar__day {
-        min-height: clamp(56px, calc(40px + 5vw), 104px);
+        min-height: clamp(72px, calc(40px + 5vw), 104px);
+    }
+
+    @media (max-width: 768px) {
+        .calendar__place {
+            max-width: none;
+            overflow: visible;
+        }
+
+        .calendar__day:nth-child(7n - 1) .calendar__place,
+        .calendar__day:nth-child(7n) .calendar__place {
+            left: auto;
+            right: 12px;
+        }
     }
 </style>
 
 <script>
-    const MONTHS = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-    ] as const;
-
     let controller: AbortController | null = null;
     let grids: HTMLElement[] = [];
     let monthIndex = 0;
@@ -193,7 +230,7 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
         controller?.abort();
         controller = new AbortController();
         grids = Array.from(document.querySelectorAll<HTMLElement>('.calendar__grid'));
-        monthLabel = document.querySelector<HTMLElement>('.calendar__month');
+        monthLabel = document.querySelector<HTMLElement>('.calendar__label');
         nextButton = document.querySelector<HTMLButtonElement>('[data-calendar-next]');
         previousButton = document.querySelector<HTMLButtonElement>('[data-calendar-previous]');
 
@@ -211,7 +248,7 @@ function getDayState(key: string, weekday: number, isTraveling: boolean) {
         if (index < 0 || index >= grids.length) return;
 
         monthIndex = index;
-        monthLabel.textContent = MONTHS[index];
+        monthLabel.textContent = grids[index].dataset.label ?? '';
         nextButton.disabled = index === grids.length - 1;
         previousButton.disabled = index === 0;
 

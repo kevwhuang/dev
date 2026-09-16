@@ -1,6 +1,7 @@
 {
-    "description": "This site.",
-    "name": "Dev",
-    "sector": "Portfolio",
+    "description": "A portfolio of Kevin Huang's web engineering work for prospective clients. Thirteen projects across five tiers sit on the work page, a ten-stage pipeline and a fifteen-tool stack on the engineering page, and a two-year calendar and a contact form on the home page. Project previews cycle screenshot frames on a shared timer, advancing only while a card is on screen and holding still under reduced motion.",
+    "domain": "dev.aephonics.com",
+    "industry": "Software",
+    "name": "Aephonics - Dev",
     "tier": "dev"
 }

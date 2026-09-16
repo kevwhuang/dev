@@ -2,9 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-import { FRAMES_MIN, TIERS } from '@lib/constants';
-
-const FRAMES_MAX = 6;
+import { TIERS } from '@lib/constants';
 
 const calendar = defineCollection({
     loader: glob({ base: './src/content/calendar', pattern: '**/*.json' }),
@@ -23,9 +21,8 @@ const projects = defineCollection({
         description: z.string(),
         domain: z.string().optional(),
         featured: z.boolean().optional(),
-        frames: z.number().int().min(FRAMES_MIN).max(FRAMES_MAX).optional(),
+        industry: z.string(),
         name: z.string(),
-        sector: z.string(),
         tier: z.enum(TIERS.map(tier => tier.id)),
     }),
 });

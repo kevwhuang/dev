@@ -3,11 +3,11 @@ import { CLASS_BUTTON, CLASS_ERROR_CODE } from '@lib/constants';
 ---
 
 <section
-    class="error-not-found section flex items-center min-h-[calc(100svh-var(--header-height))]"
+    class="error-not-found section flex items-center justify-center min-h-[calc(100svh-var(--header-height))] text-center"
     aria-labelledby="error-not-found-title"
 >
     <div
-        class="error-not-found__grid shell grid gap-x-8"
+        class="shell flex flex-col items-center"
         data-scroll
     >
         <p
@@ -18,7 +18,7 @@ import { CLASS_BUTTON, CLASS_ERROR_CODE } from '@lib/constants';
         </p>
         <h1
             id="error-not-found-title"
-            class="mb-(--gap-l) leading-[1.35] text-lead tracking-[-0.01em]"
+            class="mb-(--space-12) leading-[1.35] text-lead tracking-[-0.01em]"
         >
             <span class="sr-only">404: </span>
             Page not found.
@@ -31,24 +31,3 @@ import { CLASS_BUTTON, CLASS_ERROR_CODE } from '@lib/constants';
         </a>
     </div>
 </section>
-
-<style>
-    .error-not-found__grid {
-        grid-template-columns: 1fr 3fr;
-    }
-
-    .error-not-found__grid > * {
-        grid-column-start: 2;
-        justify-self: start;
-    }
-
-    @media (max-width: 768px) {
-        .error-not-found__grid {
-            grid-template-columns: 1fr;
-        }
-
-        .error-not-found__grid > * {
-            grid-column-start: 1;
-        }
-    }
-</style>

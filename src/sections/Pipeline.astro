@@ -1,51 +1,9 @@
 ---
-const CLASS_CARD = 'pipeline__card flex-1 grid min-w-0 gap-x-8 gap-y-2 px-5 py-4 border border-graphite-light bg-night duration-(--duration-fast) transition-colors';
+const CLASS_NODE = 'pipeline__node grid place-items-center relative isolate size-12 border border-slate rounded-full font-mono text-sm bg-night text-slate-light duration-(--duration-base) transition-[background-color,border-color,color]';
 const NUMBER_LENGTH = 2;
+const STAGES = ['Scaffold', 'Design', 'Port', 'Iteration', 'Functionality', 'Content', 'Audit', 'Quality', 'Interactivity', 'Deployment'] as const;
 
-const STAGES = [
-    {
-        description: 'Every project starts from the same base repository \u2014 build tooling, type checking, tests, CI, and security headers already configured and proven across thirteen sites.',
-        name: 'Scaffolding',
-    },
-    {
-        description: 'The look is designed and approved as working HTML before it becomes a real site, so nothing is guessed at the end.',
-        name: 'Design',
-    },
-    {
-        description: 'The approved design is rebuilt properly. Colors and type become tokens, each part of the page becomes its own file, nothing is copy-pasted.',
-        name: 'Porting',
-    },
-    {
-        description: 'Polish passes against a written standard covering spacing, naming, structure, and file layout, until the code reads the same everywhere.',
-        name: 'Iteration',
-    },
-    {
-        description: 'The parts that do something \u2014 forms, logins, dashboards, payments, and the database behind them.',
-        name: 'Functionality',
-    },
-    {
-        description: 'Real words, real images, real data, modeled so it can change later without touching code.',
-        name: 'Content',
-    },
-    {
-        description: 'Sixty-plus named checks run across the whole codebase in parallel, each finding verified independently before anything changes.',
-        name: 'Audit',
-    },
-    {
-        description: 'Contrast, keyboard access, screen-reader semantics, and layout integrity checked at every screen width.',
-        name: 'Quality',
-    },
-    {
-        description: 'Motion and scroll behavior, built to degrade cleanly for anyone who has asked their device to reduce it.',
-        name: 'Interactivity',
-    },
-    {
-        description: 'A full test suite \u2014 unit, integration, and browser \u2014 runs as the gate. It ships when that passes.',
-        name: 'Deployment',
-    },
-] as const;
-
-const stages = STAGES.map((stage, index) => ({ ...stage, number: String(index + 1).padStart(NUMBER_LENGTH, '0') }));
+const stages = STAGES.map((name, index) => ({ name, number: String(index + 1).padStart(NUMBER_LENGTH, '0') }));
 ---
 
 <section
@@ -54,50 +12,36 @@ const stages = STAGES.map((stage, index) => ({ ...stage, number: String(index + 
 >
     <div class="shell">
         <h1
-            class="mb-(--gap-l) font-bold leading-[0.95] text-display tracking-[-0.04em]"
-            data-scroll
-        >
-            Eng
-        </h1>
-        <h2
             id="pipeline-title"
-            class="mb-(--gap-l) pt-6 border-t border-graphite-light font-bold leading-[1.1] text-heading tracking-[-0.04em]"
-            data-scroll
+            class="sr-only"
         >
             Pipeline
-        </h2>
+        </h1>
         <div
-            class="pipeline__stages relative"
+            class="pipeline__flow relative"
             data-scroll
         >
             <div
-                class="pipeline__track absolute left-3 top-0 w-px bg-graphite-light"
+                class="pipeline__rail absolute inset-x-[5%] overflow-hidden top-4 h-4 pointer-events-none"
                 aria-hidden="true"
             >
-                <div class="pipeline__line absolute inset-0 bg-vermilion origin-top scale-y-0" />
+                <div class="pipeline__track absolute inset-x-0 top-2 h-px bg-graphite-light" />
+                <div class="pipeline__progress absolute inset-x-0 top-2 h-px bg-indigo origin-left" />
+                <span class="pipeline__pulse absolute left-0 top-0 size-full duration-(--duration-base) opacity-0 transition-opacity" />
             </div>
-            <ol class="flex flex-col gap-3">
-                {stages.map(stage => (
-                    <li class="pipeline__stage flex gap-4">
-                        <div class="flex justify-center shrink-0 w-6 pt-4">
-                            <span class="pipeline__dot block size-2 border border-slate bg-night duration-(--duration-fast) transition-[background-color,border-color]" aria-hidden="true" />
-                        </div>
-                        <div class="flex flex-1 items-start min-w-0 gap-4">
-                            <span
-                                class="pipeline__number relative shrink-0 w-[1.25em] pt-2 font-bold leading-none text-heading tracking-[-0.04em] text-slate-dark select-none"
-                                aria-hidden="true"
-                                data-number={stage.number}
-                            >
-                                {stage.number}
-                            </span>
-                            <div class={CLASS_CARD}>
-                                <h3 class="font-bold leading-[1.4] text-xl tracking-tight wrap-anywhere">
-                                    <span class="sr-only">Stage {stage.number}: </span>
-                                    {stage.name}
-                                </h3>
-                                <p class="pipeline__description max-w-(--measure-prose) leading-[1.55] text-base text-pretty wrap-anywhere text-silver duration-(--duration-base) opacity-65 transition-opacity">{stage.description}</p>
-                            </div>
-                        </div>
+            <ol class="pipeline__steps grid grid-cols-10">
+                {stages.map((stage, index) => (
+                    <li
+                        class="pipeline__step flex flex-col items-center gap-3 text-center"
+                        style={`--pipeline-step-index: ${index}`}
+                    >
+                        <span
+                            class={CLASS_NODE}
+                            aria-hidden="true"
+                        >
+                            {stage.number}
+                        </span>
+                        <span class="pipeline__label font-mono text-xs tracking-[0.14em] uppercase text-slate-light duration-(--duration-base) transition-colors">{stage.name}</span>
                     </li>
                 ))}
             </ol>
@@ -106,45 +50,195 @@ const stages = STAGES.map((stage, index) => ({ ...stage, number: String(index + 
 </section>
 
 <style>
-    .pipeline__card {
-        grid-template-columns: 224px minmax(0, 1fr);
+    .pipeline__flow--complete .pipeline__pulse {
+        animation: pipeline__pulse-travel 6s linear infinite;
+        opacity: 1;
     }
 
-    .pipeline__number::before {
-        background: linear-gradient(180deg, var(--color-vermilion-bright) 0%, var(--color-vermilion) 100%);
-        background-clip: text;
-        color: transparent;
-        content: attr(data-number) / '';
-        inset: 8px 0 0;
+    .pipeline__flow--complete .pipeline__step--lit .pipeline__node::after {
+        animation: pipeline__node-ring 6s linear infinite;
+        animation-delay: calc(var(--pipeline-step-index) * 6s / 9);
+    }
+
+    .pipeline__node::after {
+        border: 1px solid var(--color-indigo);
+        border-radius: 9999px;
+        content: '';
+        inset: 0;
         opacity: 0;
         position: absolute;
-        transition: opacity var(--duration-fast) ease;
+        z-index: -1;
     }
 
-    .pipeline__stage--lit .pipeline__card {
-        border-color: var(--color-slate);
+    .pipeline__node::before {
+        background-color: var(--color-indigo);
+        border-radius: 9999px;
+        content: '';
+        filter: blur(10px);
+        inset: 0;
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
     }
 
-    .pipeline__stage--lit .pipeline__description {
-        opacity: 1;
+    .pipeline__pulse::before {
+        background-color: var(--color-indigo);
+        border-radius: 9999px;
+        content: '';
+        filter: blur(2px);
+        height: 8px;
+        left: 0;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
     }
 
-    .pipeline__stage--lit .pipeline__dot {
-        background-color: var(--color-vermilion);
-        border-color: var(--color-vermilion);
+    .pipeline__step--lit .pipeline__label {
+        color: var(--color-frost);
     }
 
-    .pipeline__stage--lit .pipeline__number::before {
-        opacity: 1;
+    .pipeline__step--lit .pipeline__node {
+        background-color: var(--color-midnight);
+        border-color: var(--color-indigo);
+        color: var(--color-indigo-bright);
     }
 
-    .pipeline__stages--complete .pipeline__line {
-        transform: scaleY(1);
+    .pipeline__step--lit .pipeline__node::after {
+        animation: pipeline__node-bloom var(--duration-slow) ease-out both;
+    }
+
+    .pipeline__step--lit .pipeline__node::before {
+        animation: pipeline__node-glow var(--duration-slow) ease-out both;
+    }
+
+    @media (max-width: 1024px) {
+        .pipeline__flow--complete .pipeline__pulse {
+            animation-name: pipeline__pulse-drop;
+        }
+
+        .pipeline__progress,
+        .pipeline__track {
+            bottom: 0;
+            height: auto;
+            left: 8px;
+            right: auto;
+            top: 0;
+            width: 1px;
+        }
+
+        .pipeline__progress {
+            transform-origin: top;
+        }
+
+        .pipeline__pulse::before {
+            left: 50%;
+            top: 0;
+        }
+
+        .pipeline__rail {
+            bottom: 24px;
+            height: auto;
+            left: 16px;
+            right: auto;
+            top: 24px;
+            width: 16px;
+        }
+
+        .pipeline__step {
+            flex-direction: row;
+            gap: 16px;
+            text-align: left;
+        }
+
+        .pipeline__steps {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
     }
 
     @media (max-width: 768px) {
-        .pipeline__card {
-            grid-template-columns: 1fr;
+        .pipeline__label {
+            background-color: var(--color-night);
+            padding-inline: 8px;
+            position: relative;
+        }
+
+        .pipeline__rail {
+            left: 0;
+            margin-inline: auto;
+            right: 0;
+        }
+
+        .pipeline__step {
+            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+            text-align: center;
+        }
+    }
+
+    @keyframes pipeline__node-bloom {
+        from {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        to {
+            opacity: 0;
+            transform: scale(1.9);
+        }
+    }
+
+    @keyframes pipeline__node-glow {
+        from {
+            opacity: 0;
+        }
+
+        30% {
+            opacity: 0.35;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes pipeline__node-ring {
+        from {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        10% {
+            opacity: 0;
+            transform: scale(1.5);
+        }
+
+        to {
+            opacity: 0;
+            transform: scale(1.5);
+        }
+    }
+
+    @keyframes pipeline__pulse-drop {
+        from {
+            transform: translateY(0);
+        }
+
+        to {
+            transform: translateY(100%);
+        }
+    }
+
+    @keyframes pipeline__pulse-travel {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(100%);
         }
     }
 </style>
@@ -155,92 +249,119 @@ const stages = STAGES.map((stage, index) => ({ ...stage, number: String(index + 
 
     import { REDUCED_MOTION_QUERY } from '@lib/constants';
 
-    const COMPLETE_CLASS = 'pipeline__stages--complete';
-    const DOT_SELECTOR = '.pipeline__dot';
-    const LIT_CLASS = 'pipeline__stage--lit';
-    const STAGES_SELECTOR = '.pipeline__stages';
-    const TRIGGER_POSITION = '60%';
+    const COMPLETE_CLASS = 'pipeline__flow--complete';
+    const FLOW_SELECTOR = '.pipeline__flow';
+    const LABEL_DURATION = 0.5;
+    const LABEL_EASE = 'power2.out';
+    const LABEL_OFFSET = 8;
+    const LABEL_SELECTOR = '.pipeline__label';
+    const LIT_CLASS = 'pipeline__step--lit';
+    const NODE_DURATION = 0.5;
+    const NODE_EASE = 'back.out(1.6)';
+    const NODE_SCALE = 0.6;
+    const NODE_SELECTOR = '.pipeline__node';
+    const NODE_STAGGER = 0.12;
+    const NODE_START = 0.1;
+    const PROGRESS_DURATION = 1.4;
+    const PROGRESS_EASE = 'power2.inOut';
+    const PROGRESS_SELECTOR = '.pipeline__progress';
+    const PULSE_SELECTOR = '.pipeline__pulse';
+    const RAIL_SELECTOR = '.pipeline__rail';
+    const STEP_SELECTOR = '.pipeline__step';
+    const TRIGGER_START = 'top 85%';
+    const VERTICAL_QUERY = '(max-width: 1024px)';
 
-    const triggers: ScrollTrigger[] = [];
-
-    let lineHeight = 0;
-    let stagesObserver: ResizeObserver | null = null;
+    let timeline: gsap.core.Timeline | null = null;
 
     function initPipeline() {
         teardownPipeline();
 
-        const stages = document.querySelector<HTMLElement>(STAGES_SELECTOR);
+        const flow = document.querySelector<HTMLElement>(FLOW_SELECTOR);
 
-        if (!stages) return;
+        if (!flow) return;
 
-        const line = stages.querySelector<HTMLElement>('.pipeline__line');
-        const stageItems = stages.querySelectorAll<HTMLElement>('.pipeline__stage');
+        const labels = flow.querySelectorAll<HTMLElement>(LABEL_SELECTOR);
+        const nodes = flow.querySelectorAll<HTMLElement>(NODE_SELECTOR);
+        const progress = flow.querySelector<HTMLElement>(PROGRESS_SELECTOR);
+        const pulse = flow.querySelector<HTMLElement>(PULSE_SELECTOR);
+        const rail = flow.querySelector<HTMLElement>(RAIL_SELECTOR);
+        const steps = flow.querySelectorAll<HTMLElement>(STEP_SELECTOR);
 
-        if (!line) return;
-
-        stagesObserver = new ResizeObserver(measureLine);
-        measureLine();
-        stagesObserver.observe(stages);
+        if (!progress || !pulse || !rail) return;
 
         if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
-            stageItems.forEach(stage => stage.classList.add(LIT_CLASS));
-            stages.classList.add(COMPLETE_CLASS);
+            flow.classList.add(COMPLETE_CLASS);
+            gsap.set(labels, { opacity: 1, y: 0 });
+            gsap.set(nodes, { opacity: 1, scale: 1 });
+            gsap.set(progress, { scaleX: 1, scaleY: 1 });
+            gsap.set(pulse, { x: 0, y: 0 });
+            steps.forEach(step => step.classList.add(LIT_CLASS));
 
             return;
         }
 
-        const lineTween = gsap.fromTo(line, { scaleY: 0 }, {
-            ease: 'none',
-            scaleY: 1,
+        const isVertical = window.matchMedia(VERTICAL_QUERY).matches;
+
+        gsap.set(labels, { opacity: 0, y: LABEL_OFFSET });
+        gsap.set(nodes, { opacity: 0, scale: NODE_SCALE });
+        gsap.set(progress, isVertical ? { scaleX: 1, scaleY: 0 } : { scaleX: 0, scaleY: 1 });
+        gsap.set(pulse, { opacity: 0, x: 0, y: 0 });
+
+        const flowTimeline = gsap.timeline({
+            onComplete: () => {
+                flow.classList.add(COMPLETE_CLASS);
+                gsap.set(pulse, { x: 0, y: 0 });
+            },
             scrollTrigger: {
-                end: () => `+=${lineHeight}`,
-                onRefreshInit: measureLine,
-                scrub: true,
-                start: `top ${TRIGGER_POSITION}`,
-                trigger: stages,
+                once: true,
+                start: TRIGGER_START,
+                trigger: flow,
             },
         });
 
-        if (lineTween.scrollTrigger) triggers.push(lineTween.scrollTrigger);
+        flowTimeline.set(pulse, { opacity: 1 }, 0);
 
-        stageItems.forEach((stage) => {
-            const dot = stage.querySelector<HTMLElement>(DOT_SELECTOR);
+        flowTimeline.to(progress, {
+            duration: PROGRESS_DURATION,
+            ease: PROGRESS_EASE,
+            scaleX: 1,
+            scaleY: 1,
+        }, 0);
 
-            if (!dot) return;
+        flowTimeline.to(pulse, {
+            duration: PROGRESS_DURATION,
+            ease: PROGRESS_EASE,
+            x: () => (isVertical ? 0 : rail.offsetWidth),
+            y: () => (isVertical ? rail.offsetHeight : 0),
+        }, 0);
 
-            triggers.push(ScrollTrigger.create({
-                onEnter: () => stage.classList.add(LIT_CLASS),
-                onLeaveBack: () => stage.classList.remove(LIT_CLASS),
-                start: `center ${TRIGGER_POSITION}`,
-                trigger: dot,
-            }));
+        flowTimeline.to(nodes, {
+            duration: NODE_DURATION,
+            ease: NODE_EASE,
+            opacity: 1,
+            scale: 1,
+            stagger: NODE_STAGGER,
+        }, NODE_START);
+
+        flowTimeline.to(labels, {
+            duration: LABEL_DURATION,
+            ease: LABEL_EASE,
+            opacity: 1,
+            stagger: NODE_STAGGER,
+            y: 0,
+        }, NODE_START);
+
+        steps.forEach((step, index) => {
+            flowTimeline.call(() => step.classList.add(LIT_CLASS), undefined, NODE_START + index * NODE_STAGGER);
         });
-    }
 
-    function measureLine() {
-        const stages = document.querySelector<HTMLElement>(STAGES_SELECTOR);
-        const track = document.querySelector<HTMLElement>('.pipeline__track');
-
-        if (!stages || !track) return;
-
-        const dots = stages.querySelectorAll<HTMLElement>(DOT_SELECTOR);
-
-        const lastDot = dots[dots.length - 1];
-
-        if (!lastDot) return;
-
-        const dotRect = lastDot.getBoundingClientRect();
-        const stagesTop = stages.getBoundingClientRect().top;
-
-        lineHeight = dotRect.top - stagesTop + dotRect.height / 2;
-        track.style.height = `${lineHeight}px`;
+        timeline = flowTimeline;
     }
 
     function teardownPipeline() {
-        stagesObserver?.disconnect();
-        stagesObserver = null;
-        triggers.forEach(trigger => trigger.kill());
-        triggers.length = 0;
+        timeline?.scrollTrigger?.kill();
+        timeline?.kill();
+        timeline = null;
     }
 
     document.addEventListener('astro:before-swap', teardownPipeline);

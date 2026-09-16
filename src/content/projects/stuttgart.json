@@ -1,0 +1,7 @@
+{
+    "description": "Full-screen scenes replace conventional navigation on a site for a film series, moved through with the arrow keys. The plan covers a landing scene plus project info, sponsors, and contact, on a rigid grid with hairline dividers. Only the scaffold exists so far, and the brief holds every scene to a visible focusable control so the arrow keys are never the only way through.",
+    "domain": "al-unity.netlify.app",
+    "industry": "Film",
+    "name": "Stuttgart Series",
+    "tier": "creative"
+}

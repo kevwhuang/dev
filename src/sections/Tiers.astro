@@ -4,37 +4,56 @@ import { getCollection } from 'astro:content';
 import ProjectCard from '@components/ProjectCard.astro';
 import { TIERS } from '@lib/constants';
 
+const NUMBER_LENGTH = 2;
+
 const projects = await getCollection('projects');
 
-const tiers = TIERS.map(tier => ({
-    ...tier,
-    projects: projects
+const tiers = TIERS.map((tier) => {
+    const tierProjects = projects
         .filter(project => project.data.tier === tier.id)
-        .sort((first, second) => first.data.name.localeCompare(second.data.name)),
-}));
+        .sort((first, second) => first.data.name.localeCompare(second.data.name));
+    const total = String(tierProjects.length).padStart(NUMBER_LENGTH, '0');
+
+    return {
+        ...tier,
+        projects: tierProjects.map((project, index) => ({
+            number: String(index + 1).padStart(NUMBER_LENGTH, '0'),
+            project,
+            total,
+        })),
+    };
+});
 ---
 
-{tiers.map(tier => (
+{tiers.map((tier, index) => (
     <section
-        class="tiers last-of-type:pb-(--section-padding) py-(--section-padding-tight)"
+        class="tiers"
         aria-labelledby={`tiers-${tier.id}-title`}
     >
         <div class="shell">
+            {index === 0 && <h1 class="sr-only">Work</h1>}
             <h2
                 id={`tiers-${tier.id}-title`}
-                class="mb-(--gap-l) pt-6 border-t border-graphite-light font-bold leading-[1.1] text-heading tracking-[-0.04em]"
+                class="mb-(--space-16) font-bold leading-[0.95] text-display tracking-[-0.04em]"
                 data-scroll
             >
                 {tier.label}
             </h2>
             <ul
-                class="tiers__grid flex flex-wrap justify-center gap-8"
+                class="grid grid-cols-1 gap-(--space-24)"
                 data-scroll
                 data-scroll-stagger="0.08"
             >
-                {tier.projects.map(project => (
-                    <li class="basis-[calc(50%-16px)] min-w-0">
-                        <ProjectCard project={project.data} />
+                {tier.projects.map(entry => (
+                    <li
+                        id={entry.project.id}
+                        class="tiers__stanza flex flex-col gap-4 min-w-0"
+                    >
+                        <div class="flex items-center gap-4 pt-4 border-t border-graphite-light">
+                            <span class="font-mono text-xs tracking-[0.14em] uppercase text-indigo-bright">{entry.number}</span>
+                            <span class="font-mono text-xs tracking-[0.14em] uppercase text-slate-light">{`/ ${entry.total}`}</span>
+                        </div>
+                        <ProjectCard project={entry.project} />
                     </li>
                 ))}
             </ul>
@@ -43,9 +62,11 @@ const tiers = TIERS.map(tier => ({
 ))}
 
 <style>
-    @media (max-width: 768px) {
-        .tiers__grid > li {
-            flex-basis: 100%;
-        }
+    .tiers {
+        padding-block-start: var(--space-48);
+    }
+
+    .tiers__stanza {
+        scroll-margin-top: var(--space-24);
     }
 </style>

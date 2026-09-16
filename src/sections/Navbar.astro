@@ -1,8 +1,8 @@
 ---
+import IconLogo from '@components/icons/Logo.astro';
 import { ROUTES } from '@lib/constants';
 
-const CLASS_LINK = 'navbar__link active:opacity-70 focus-visible:text-frost hover:text-frost inline-flex items-center relative h-12 font-mono text-xs tracking-[0.14em] uppercase text-silver duration-(--duration-fast) transition-[color,opacity]';
-const CLASS_LOGO = 'navbar__logo active:opacity-70 focus-visible:text-vermilion hover:text-vermilion inline-flex items-center relative font-bold leading-none text-2xl tracking-[-0.06em] text-frost duration-(--duration-fast) transition-[color,opacity]';
+const CLASS_LINK = 'navbar__link active:opacity-70 focus-visible:text-frost hover:text-frost inline-flex items-center relative h-12 px-3 font-mono text-xs tracking-[0.14em] uppercase text-silver duration-(--duration-fast) transition-[color,opacity]';
 
 const navLinks = ROUTES.map(route => ({ ...route, isActive: Astro.url.pathname === route.href }));
 ---
@@ -13,13 +13,13 @@ const navLinks = ROUTES.map(route => ({ ...route, isActive: Astro.url.pathname =
         aria-label="Main"
     >
         <a
-            class={CLASS_LOGO}
-            aria-label="Kevin Huang &mdash; Web Engineering, home"
+            class="navbar__logo active:opacity-70 focus-visible:text-indigo-bright hover:text-indigo-bright inline-flex items-center relative text-indigo duration-(--duration-fast) transition-[color,opacity]"
+            aria-label="Dev, home"
             href="/"
         >
-            WE
+            <IconLogo />
         </a>
-        <ul class="flex items-center gap-(--gap-m)">
+        <ul class="flex items-center gap-[clamp(16px,calc(10.6667px+1.6667vw),32px)]">
             {navLinks.map(link => (
                 <li>
                     <a
@@ -36,22 +36,17 @@ const navLinks = ROUTES.map(route => ({ ...route, isActive: Astro.url.pathname =
 </header>
 
 <style>
-    .navbar__link::before {
-        content: '';
-        inset: 0 -8px;
-        position: absolute;
-    }
-
     .navbar__link--active {
         color: var(--color-frost);
     }
 
+    .navbar__link--active:focus-visible,
     .navbar__link--active:hover {
-        color: var(--color-vermilion);
+        color: var(--color-indigo-bright);
     }
 
     .navbar__link--active::after {
-        background: var(--color-vermilion);
+        background: var(--color-indigo);
         bottom: 12px;
         content: '';
         height: 1px;

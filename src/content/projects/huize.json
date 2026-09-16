@@ -1,0 +1,7 @@
+{
+    "description": "A Chinese-first corporate site for Huize Health, a Shanghai digital health company serving insurers, employers, and individual clients. Nineteen pages and five JSON endpoints draw on ten collections covering 43 institutions, 29 provinces, 21 wellness bases, and 12 news items. A development-only inline editor makes page text editable in place, holding pending changes in localStorage with undo and Chinese-labelled controls.",
+    "domain": "huizehealth.netlify.app",
+    "industry": "Healthcare",
+    "name": "Huize Health",
+    "tier": "enterprise"
+}

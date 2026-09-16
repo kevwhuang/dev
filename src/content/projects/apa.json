@@ -1,0 +1,8 @@
+{
+    "description": "The hub for a collective of music producers in Austin, Texas. Twenty-four routes cover events, a member directory, resources, a store, and door check-in, all built from six content collections that include the event calendar, eight producer profiles, and eight store products. On the rack page, a local audio file runs through sixteen named Web Audio effect modules in a fixed chain order, over a Three.js scene.",
+    "domain": "austinproduceralliance.com",
+    "featured": true,
+    "industry": "Music",
+    "name": "Austin Producer Alliance",
+    "tier": "enterprise"
+}

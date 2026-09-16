@@ -1,9 +1,8 @@
 {
     "completed": "2026-06",
-    "description": "A searchable reference of algorithm and data-structure solutions, several hundred entries deep, with instant client-side search across the whole index.",
+    "description": "Over 4,000 problem pages archive Kevin Huang's LeetCode solutions in six languages, alongside thirteen data structure implementations. Search runs from a JSON index reachable with a slash shortcut, and per-difficulty progress bars sit beside an upcoming events list scraped from Meetup at build time. Two custom content loaders read the raw source files, one parsing a numbered header comment into an id and title, the other using the filename.",
     "domain": "algo.aephonics.com",
-    "frames": 5,
-    "name": "Algo",
-    "sector": "Reference",
+    "industry": "Software",
+    "name": "Aephonics - Algo",
     "tier": "dev"
 }

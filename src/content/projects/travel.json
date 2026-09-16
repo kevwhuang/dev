@@ -1,9 +1,8 @@
 {
     "completed": "2026-08",
-    "description": "An interactive world map built on MapLibre GL with self-hosted Protomaps vector tiles. No third-party map service, no API key, no usage bill.",
+    "description": "An interactive travel atlas of places Kevin Huang has visited, shown as a map or as cards. 542 markers across 13 journeys carry 10 categories, 29 starred favorites, and eight shaded region outlines, filtered and searched from one page that remembers its state. A build step extracts the basemap from a daily Protomaps planet build and fails if any marker falls outside the tiled coverage.",
     "domain": "travel.aephonics.com",
-    "frames": 6,
-    "name": "Travel",
-    "sector": "Personal",
+    "industry": "Travel",
+    "name": "Aephonics - Travel",
     "tier": "creative"
 }

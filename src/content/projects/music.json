@@ -1,7 +1,7 @@
 {
-    "description": "A catalog of original music with a player built from scratch: waveform rendering, keyboard transport controls, and a production credits index.",
+    "description": "A console-style player anchors a one-page music production portfolio for an Austin producer and engineer. It streams 188 tracks across music, sessions, and productions, with waveform scrubbing, VU meters, and a catalog filtered by key, year, and BPM. Waveforms render from peak data extracted with ffmpeg ahead of time, and WAV downloads sit behind a PIN checked in a Netlify edge function.",
     "domain": "music.aephonics.com",
-    "name": "Music",
-    "sector": "Music",
+    "industry": "Music",
+    "name": "Aephonics - Music",
     "tier": "creative"
 }
