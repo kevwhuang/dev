@@ -28,6 +28,7 @@
     "workbench.colorTheme": "Default High Contrast",
     "workbench.editor.editorActionsLocation": "hidden",
     "workbench.editor.empty.hint": "hidden",
+    "workbench.experimental.modernUI": false,
     "workbench.layoutControl.enabled": false,
     "workbench.secondarySideBar.defaultVisibility": "hidden",
     "workbench.startupEditor": "none"
