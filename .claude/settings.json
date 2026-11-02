@@ -2,7 +2,6 @@
     "permissions": {
         "allow": [
             "Agent",
-            "Artifact",
             "AskUserQuestion",
             "Bash",
             "CronCreate",
@@ -26,11 +25,9 @@
             "RemoteTrigger",
             "ReportFindings",
             "ScheduleWakeup",
-            "SendFeedback",
             "SendMessage",
             "SendUserFile",
             "Skill",
-            "TaskOutput",
             "TaskStop",
             "ToolSearch",
             "WebFetch",
